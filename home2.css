@@ -1,0 +1,38 @@
+body {
+  background: #000000;
+  color: #00ff41;
+  font-family: "Matrix Code NFI", sans-serif;
+  text-shadow: 0 0 3px #00ff41, 0 0 5px #00ff41, 0 0 5px #00ff41;
+}
+
+a {
+  color: #ff5f2e;
+}
+b:hover {
+  color: #fcbe32;
+}
+
+h1 {
+  text-align: center;
+}
+
+.screen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%);
+  content: " ";
+  overflow: hidden;
+
+  background-size: cover;
+}
+.form-popup {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 50px;
+
+  z-index: 9;
+}

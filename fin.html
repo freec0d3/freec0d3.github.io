@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/home2.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js" integrity="sha512-DkPsH9LzNzZaZjCszwKrooKwgjArJDiEjA5tTgr3YX4E6TYv93ICS8T41yFHJnnSmGpnf0Mvb5NhScYbwvhn2w==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TimelineMax.min.js" integrity="sha512-0xrMWUXzEAc+VY7k48pWd5YT6ig03p4KARKxs4Bqxb9atrcn2fV41fWs+YXTKb8lD2sbPAmZMjKENiyzM/Gagw==" crossorigin="anonymous"></script>
+    <title>Document</title>
+  </head>
+  <section class="screen">
+    <div class="content">
+      <!-- [FS] NOTE: This is can be treated also as normal web page and containg normal content -->
+      <body>
+      <h1></h1>
+      <br>
+      >>>Salida del sistema:
+      <p id="demo"></p>
+  
+      <script>
+        var i = 0;
+        var txt = `…LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  …LUGARES A LA VEZ! 
+  `;
+        var speed = 50;
+  
+        function typeWriter() {
+          if (i < txt.length) {
+            document.getElementById("demo").innerHTML += txt.charAt(i);
+            i++;
+            setTimeout(typeWriter, speed);
+          }
+        }
+        typeWriter();
+
+
+        (function() {
+  var SELECTOR_SCREEN_ELEMENT = '.screen';
+  var SELECTOR_SWITCHER_TV = '#switcher-tv';
+  
+  var isTurnedOn = true;
+  
+  var timeline;
+  
+  function buildTimeline() {
+    timeline = new TimelineMax({
+      paused: false
+      
+    });
+    
+    timeline
+    .to(SELECTOR_SCREEN_ELEMENT, .2, {
+      width: '100vw',
+      height: '2px',
+      background: '#ffffff',
+      ease: Power2.easeOut
+    })
+    .to(SELECTOR_SCREEN_ELEMENT, .2, {
+      width: '0',
+      height: '0',
+      background: '#ffffff'
+    });
+ setTimeout(openForm,1000);
+  }
+  
+  
+  
+  // Initialize
+  setTimeout(buildTimeline,8000);
+  
+  // Bindings
+
+})();
+
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+
+
+
+
+
+      </script>
+    </body>
+  
+    <style>
+      #foo {
+        position: fixed;
+        bottom: 0;
+        right: 10;
+        font-size: 200%;
+      }
+    </style>
+  <!-- <div id="foo">..........FIN</div>-->
+  
+      </html>
+  
+    </div>
+  </section>
+  
+  <div class="form-popup" id="myForm">
+    <form action="/action_page.php" class="form-container">
+      <h1>FIN.</h1>
+  
+      
+      
+  
+      
+    </form>
+  </div>
