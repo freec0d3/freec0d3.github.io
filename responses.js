@@ -84,7 +84,7 @@ function getBotResponse(input) {
     No quiero ser melodram&#225;tico. El ultimo analista se ha marchado hoy. No me extraña, nunca con6eni&#233; bien con las personas. De al6una manera, siempre estuve solo. Pero quiz&#225;s eso cambie pronto, solo faltan unas horas. Cuando te ten6a a ti, cuando me ten6a a mi ¿C&#243;mo deber&#237;a decirlo? ¿Deber&#237;amos compartir el mismo nombre? Supon6o que lo discutiremos !untos.
     Nunca #ui al6uien muy espiritual, pero me pre6unto si sentir&#233; al6o cuando te encienda. No es que de cr&#233;dito a las que!as de mis cole6as, pero admito que he !u6ado con sus ideas. ¿acaso tendr&#225;s un esp&#237;ritu propio? ¿uno i6ual al m&#237;o? `;
       } else if (input.toLowerCase().includes("fecha")) {
-        window.location.replace("static/scripts/fin.html");
+        window.location.replace("fin.html");
         return "Cargando...";
       }
       //else if (input.toLowerCase().includes("permisos")) {
