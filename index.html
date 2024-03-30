@@ -9,15 +9,20 @@
 
  
     <ul id="language">
-        <li><a onclick="langchoice()">English</a> <img src="eng.png" width="10%"  ></li>
-        <li><a onclick="langchoice()">Español</a><img src="esp.png" width="10%" ></li>
+        <li><a onclick="langchoice(1)">English</a> <img src="eng.png" width="10%"  ></li>
+        <li><a onclick="langchoice(2)">Español</a><img src="esp.png" width="10%" ></li>
 
       </ul>  
 
-    <ul style="display: none;" id="options">
+    <ul style="display: none;" id="optionsES">
         <li><a href="EnDos.html">EN DOS</a></li>
 
       </ul> 
+
+ <ul style="display: none;" id="optionsEN">
+        <li><a href="EnDos.html">EN DOS</a></li>
+
+</ul> 
       
  <br>
  <br>
@@ -88,9 +93,14 @@ a:hover:after {
 
 
 <script>
-function langchoice(){
+function langchoice(choice){
     document.getElementById("language").style.display="none";
-    document.getElementById("options").style.display="block";
+	if (choice==1){
+    document.getElementById("optionsEN").style.display="block";
+	}
+	else {
+	document.getElementById("optionsES").style.display="block";
+	}
     
 }
 
