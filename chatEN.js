@@ -43,7 +43,7 @@ function getResponse() {
   let userText = $("#textInput").val();
 
   if (userText == "") {
-    userText = "EN DOS...";
+    userText = "IN TWO...";
   }
 
   let userHtml = '<p class="userText"><span>' + userText + "</span></p>";
@@ -82,7 +82,7 @@ $("#textInput").keypress(function (e) {
   }
 });
 
-let text = `Nota del `;
+let text = `Note from `;
 let result1 = text.replace(/f/g, "#");
 let result2 = result1.replace(/j/g, "!");
 let result3 = result2.replace(/g/g, "6");
