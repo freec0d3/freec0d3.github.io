@@ -84,7 +84,7 @@ function getBotResponse(input) {
     I don't want to be melodramatic. The last analyst left today. I'm not surprised; I never got along well with people. In a way, I've always been alone. But maybe that will change soon, only a few hours left. When I have you, when I have myself, how should I put it? Should we share the same name? I suppose we'll discuss it together.
     I was never very spiritual, but I wonder if I'll feel something when I turn you on. It's not that I credit my colleagues' complaints, but I admit I've struggled with their ideas. Will you have your own spirit? One like mine?`;
       } else if (input.toLowerCase().includes("date")) {
-        window.location.replace("static/scripts/end.html");
+        window.location.replace("end.html");
         return "Loading...";
       }
       //else if (input.toLowerCase().includes("permissions")) {
