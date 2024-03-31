@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Err0r#!!</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+  <style>
+body {
+      font-family: Verdana, sans-serif;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .row > .column {
+      padding: 0 8px;
+    }
+
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .column {
+      float: right;
+      width: 25%;
+    }
+
+    /* The Modal (background) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      padding-top: 50px;
+      left: 0;
+      top: 0;
+      width: 50%;
+      height: 90%;
+      overflow: auto;
+      background-color: black;
+      left: 20%;
+    }
+
+    /* Modal Content */
+    .modal-content {
+      position: relative;
+      background-color: #fefefe;
+      margin: auto;
+      padding: 0;
+      width: 60%;
+      
+      max-width: 70%;
+    }
+
+    /* The Close Button */
+    .close {
+      color: white;
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      font-size: 35px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #999;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .mySlides {
+      display: none;
+    }
+
+    .cursor {
+      cursor: pointer;
+    }
+
+    /* Next & previous buttons */
+    .prev,
+    .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 6px;
+      margin-top: -50px;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      transition: 0.6s ease;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+      -webkit-user-select: none;
+      
+    }
+
+    /* Position the "next button" to the right */
+    .next {
+      right: -20%;
+      border-radius: 3px 0 0 3px;
+      
+    }
+    .prev {
+      left: -20%;
+      border-radius: 3px 0 0 3px;
+      
+    }
+
+    /* On hover, add a black background color with a little bit see-through */
+    .prev:hover,
+    .next:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    /* Number text (1/3 etc) */
+    .numbertext {
+      color: #f2f2f2;
+      font-size: 12px;
+      padding: 8px 12px;
+      position: absolute;
+      top: 0;
+    }
+
+    img {
+      margin-bottom: -4px;
+    }
+
+    .caption-container {
+      text-align: center;
+      background-color: black;
+      padding: 2px 16px;
+      color: white;
+    }
+
+    .demo {
+      opacity: 0.6;
+    }
+
+    .active,
+    .demo:hover {
+      opacity: 1;
+    }
+
+    img.hover-shadow {
+      transition: 0.3s;
+    }
+
+    .hover-shadow:hover {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+
+    .chat-bar-collapsible {
+  position: fixed;
+
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.collapsible {
+  background-color: #000;
+  color: #00ff41;
+  text-shadow: 0 0 3px #00ff41, 0 0 5px #00ff41, 0 0 5px #00ff41;
+  cursor: pointer;
+  padding: 18px;
+  width: 1250px;
+  text-align: left;
+  outline: none;
+  font-size: 18px;
+}
+
+.full-chat-block {
+  width: 100%;
+  background: #000;
+  text-align: center;
+  overflow: auto;
+  scrollbar-width: none;
+  height: max-content;
+  transition: max-height 0.2s ease-out;
+}
+
+.outer-container {
+  min-height: 500px;
+  bottom: 0%;
+  position: relative;
+}
+
+.chat-container {
+  max-height: 500px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  scroll-behavior: smooth;
+  hyphens: auto;
+}
+
+.chat-container::-webkit-scrollbar {
+  display: none;
+}
+
+.chat-bar-input-block {
+  display: flex;
+  float: left;
+  box-sizing: border-box;
+  justify-content: space-between;
+  width: 50%;
+  align-items: center;
+  background-color: rgb(12, 12, 12);
+  border-radius: 10px 10px 0px 0px;
+  padding: 10px 0px 10px 10px;
+}
+
+.chat-bar-icons {
+  display: flex;
+  justify-content: space-evenly;
+  box-sizing: border-box;
+  width: 25%;
+  float: right;
+  font-size: 20px;
+}
+
+#chat-icon:hover {
+  opacity: 0.7;
+}
+
+/* Chat bubbles */
+
+#userInput {
+  width: 75%;
+}
+
+.input-box {
+  float: left;
+  border: none;
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+  color: #00ff41;
+  text-shadow: 0 0 3px #00ff41, 0 0 5px #00ff41, 0 0 5px #00ff41;
+  background-color: #000;
+  outline: none;
+}
+
+.userText {
+  color: white;
+  font-family: Helvetica;
+  font-size: 16px;
+  font-weight: normal;
+  text-align: right;
+  clear: both;
+}
+
+.userText span {
+  line-height: 1.5em;
+  display: inline-block;
+  background: #000;
+  padding: 10px;
+  border-radius: 8px;
+  border-bottom-right-radius: 2px;
+  max-width: 80%;
+  margin-right: 10px;
+  animation: floatup 0.5s forwards;
+}
+
+.botText {
+  color: #39ff14;
+  font-family: Helvetica;
+  font-weight: normal;
+  font-size: 16px;
+  text-align: left;
+}
+
+.botText span {
+  line-height: 1.5em;
+  display: inline-block;
+  background: #000;
+  padding: 10px;
+  border-radius: 8px;
+  border-bottom-left-radius: 2px;
+  max-width: 80%;
+  margin-left: 10px;
+  animation: floatup 0.5s forwards;
+}
+
+@keyframes floatup {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .full-chat-block {
+    width: 100%;
+    border-radius: 0px;
+  }
+  .chat-bar-collapsible {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+  }
+  .collapsible {
+    width: 100%;
+    border: 0px;
+    border-top: 3px solid white;
+    border-radius: 0px;
+  }
+}
+ 
+ 
+ html {
+  scroll-behavior: smooth;
+  font-family: Helvetica, sans-serif, Arial;
+}
+
+body {
+  background: #000000;
+  color: #00ff41;
+  font-family: "Matrix Code NFI", sans-serif;
+  text-shadow: 0 0 3px #00ff41, 0 0 5px #00ff41, 0 0 5px #00ff41;
+}
+ 
+  </style>
+</head>
+<body>
+
+<div class="chat-bar-collapsible">
+  <div id="chat-button" type="button" class="collapsible">
+    #"""Corrupt!!##!
+  </div>
+
+  <div class="content">
+    <div class="full-chat-block">
+      <!-- Message Container -->
+      <div class="outer-container">
+        <div class="chat-container">
+          <!-- Messages -->
+          <div id="chatbox">
+            <h5 id="chat-timestamp"></h5>
+            <p id="botStarterMessage" class="botText">
+              <span>Cargando...</span>
+            </p>
+          </div>
+
+          <!-- User input box -->
+          <div class="chat-bar-input-block">
+            <div id="userInput">
+              <input
+                id="textInput"
+                class="input-box"
+                type="text"
+                name="msg"
+                placeholder="..."
+              />
+              <p></p>
+            </div>
+
+            <div class="chat-bar-icons">
+              <i
+                id="chat-icon"
+                style="color: rgb(101, 248, 2)"
+                class="fa fa-play"
+                onclick="sendButton()"
+              ></i>
+            </div>
+          </div>
+
+          <div id="chat-bar-bottom">
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var triggers=[];
+  var answers=[];
+  var user="";
+
+
+        google.script.run.withSuccessHandler(function(result) {
+  // Handle the result here
+  user=result;
+ 
+}).getUser();
+
+
+      google.script.run.withSuccessHandler(function(result) {
+  // Handle the result here
+  triggers=result;
+ 
+}).getTriggers();
+
+
+
+    google.script.run.withSuccessHandler(function(result) {
+  // Handle the result here
+  answers=result;
+ 
+}).getAnswers();
+
+
+  function getTime() {
+    let today = new Date();
+    hours = today.getHours();
+    minutes = today.getMinutes();
+
+    if (hours < 10) {
+      hours = "0" + hours;
+    }
+
+    if (minutes < 10) {
+      minutes = "0" + minutes;
+    }
+
+    let time = hours + ":" + minutes;
+    return time;
+  }
+
+  // Gets the first message
+  function firstBotMessage() {
+    let firstMessage = "Enter your name";
+    document.getElementById("botStarterMessage").innerHTML =
+      '<p class="botText"><span>' + firstMessage + "</span></p>";
+
+    let time = getTime();
+
+    $("#chat-timestamp").append(time);
+    document.getElementById("userInput").scrollIntoView(false);
+  }
+
+  firstBotMessage();
+
+  // Retrieves the response
+  function getHardResponse(userText) {
+    let botResponse = getBotResponse(userText);
+    let botHtml = '<p class="botText"><span>' + botResponse + "</span></p>";
+    $("#chatbox").append(botHtml);
+
+    document.getElementById("chat-bar-bottom").scrollIntoView(true);
+  }
+
+  // Gets the text text from the input box and processes it
+  function getResponse() {
+    let userText = $("#textInput").val();
+
+    if (userText == "") {
+      userText = "...";
+    }
+
+    let userHtml = '<p class="userText"><span>' + userText + "</span></p>";
+
+    $("#textInput").val("");
+    $("#chatbox").append(userHtml);
+    document.getElementById("chat-bar-bottom").scrollIntoView(true);
+
+    setTimeout(() => {
+      getHardResponse(userText);
+    }, 1000);
+  }
+
+
+
+  function sendButton() {
+    getResponse();
+  }
+
+  // Press enter to send a message
+  $("#textInput").keypress(function (e) {
+    if (e.which == 13) {
+      getResponse();
+    }
+  });
+
+
+  let t = 0;
+  let w = 0;
+
+  function reset() {
+    w = 0;
+  }
+
+  function getBotResponse(input) {
+ //rock paper scissors
+
+ if (input.toLowerCase().includes(user.toLowerCase())) {
+    t = 1;
+    return "Welcome back, i have important information for you.";
+  }
+  if (t == 1) {
+    if (w == 0) {
+
+      for (let i = 0; i < triggers.length; i++) {
+        // Check if the value is totally or partially equal to the current list item
+        if (input.toLowerCase().includes(triggers[i].toLowerCase())) {
+
+           w = 1;
+        setTimeout(reset, 15000);
+            // Return the index of the matching item
+            return answers[i];
+        }
+      
+        
+       }
+       return "I apologize, my responses are limited. You must ask the right questions.";
+       
+        }else {
+      return "Saturated processor, try again in 15 seconds.";
+    }
+  } else {
+    return "Unknown user";
+  }
+}
+
+</script>
+
+</body>
+</html>
