@@ -97,6 +97,6 @@ function getBotResponse(input) {
       return "Processor saturated, try again in 15 seconds";
     }
   } else {
-    return "User not identified";
+    return "Unkn0wn us3r";
   }
 }
