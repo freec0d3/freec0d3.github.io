@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Formulario de firma</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow-x: hidden;
+        }
+
+        .form-container label {
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 10px;
+            text-align: left;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-container input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            max-width: 200px;
+            padding: 10px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #673ab7;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #311b92;
+        }
+
+        canvas {
+            border: 1px solid black;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 500px;
+            touch-action: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #673ab7;
+        }
+
+        .modal-content button {
+            background-color: #673ab7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .modal-content button:hover {
+            background-color: #311b92;
+        }
+
+
+                h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        p {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+
+        #spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #673ab7;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+    </style>
+</head>
+<body>
+<div id="spinner">
+  <div class="loader"></div>
+</div>
+
+
+
+  <div id="doc-content" style="width: 100%; max-width: 800px; margin: auto;">
+    <h1 id="dinamycTitle"></h1>
+    <p id="dinamycText"></p>
+    </div>
+<div class="form-container">
+    
+
+    <label>Nombre:</label>
+    <input type="text" id="name" required>
+
+    <label>Fecha de nacimiento</label>
+    <input type="date" id="dateOfBirth" required>
+
+    <label>Numero de telefono:</label>
+    <input type="text" id="phone" required>
+
+    
+    <input type="hidden" id="admin" required>
+
+<br>
+    <label id="dinamycQuestion">Firma:</label>
+    <canvas id="signature" height="200"></canvas>
+
+    <button id="clearButton">Borrar</button>
+    <button id="submit">Enviar</button>
+
+
+
+</div>
+
+
+<div id="thankYouModal" class="modal">
+    <div class="modal-content">
+        <h2>¡Tu respuesta ha sido registrada!</h2>
+        <h1>Puedes cerrar esta ventana.</h1>
+        
+
+            <br><br><br>
+<a href="https://es.fiverr.com/s/BR27qWd">¿Necesitas un formulario como este? Haz clic aquí.</a>
+    </div>
+</div>
+
+<script>
+   //<button onclick="closeModal()">Enter another response.</button> 
+    const canvas = document.getElementById("signature");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+    let savedCanvasData;
+
+   // const code = "DIZ6I"; // 🔑 Este es tu código que identifica los datos a pedir
+
+    const code = window.location.search.substring(1);
+
+if (!code) {
+  alert("⚠️ No se encontró el código en la URL. Asegurate de estar accediendo al formulario desde el enlace correcto.");
+}
+
+
+    function resizeCanvas() {
+        const maxWidth = 500;
+        const width = Math.min(window.innerWidth * 0.9, maxWidth);
+        canvas.width = width;
+        canvas.height = width * 0.4;
+
+        if (savedCanvasData) {
+            const img = new Image();
+            img.src = savedCanvasData;
+            img.onload = () => ctx.drawImage(img, 0, 0);
+        }
+    }
+
+    function saveCanvasState() {
+        savedCanvasData = canvas.toDataURL();
+    }
+
+    function restoreCanvasState() {
+        if (savedCanvasData) {
+            const img = new Image();
+            img.src = savedCanvasData;
+            img.onload = () => ctx.drawImage(img, 0, 0);
+        }
+    }
+
+    window.addEventListener("resize", () => {
+        saveCanvasState();
+        resizeCanvas();
+        restoreCanvasState();
+    });
+
+    resizeCanvas();
+
+    function getCanvasPosition() {
+        const rect = canvas.getBoundingClientRect();
+        return { offsetX: rect.left, offsetY: rect.top };
+    }
+
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.addEventListener("mousemove", draw);
+
+    canvas.addEventListener("touchstart", startDrawingTouch);
+    canvas.addEventListener("touchend", stopDrawingTouch);
+    canvas.addEventListener("touchmove", drawTouch);
+
+    function startDrawing(e) {
+        drawing = true;
+        ctx.beginPath();
+        draw(e);
+    }
+
+    function startDrawingTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const pos = getCanvasPosition();
+        startDrawing({ offsetX: touch.clientX - pos.offsetX, offsetY: touch.clientY - pos.offsetY });
+    }
+
+    function stopDrawing() {
+        drawing = false;
+        ctx.beginPath();
+    }
+
+    function stopDrawingTouch(e) {
+        e.preventDefault();
+        if (e.touches.length === 0) stopDrawing();
+    }
+
+    function draw(e) {
+        if (!drawing) return;
+        const x = e.offsetX;
+        const y = e.offsetY;
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "black";
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    function drawTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const pos = getCanvasPosition();
+        draw({ offsetX: touch.clientX - pos.offsetX, offsetY: touch.clientY - pos.offsetY });
+    }
+
+    document.getElementById("clearButton").addEventListener("click", () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        savedCanvasData = null;
+    });
+
+    document.getElementById("submit").addEventListener("click", function () {
+        const name = document.getElementById("name").value;
+        const birth = document.getElementById("dateOfBirth").value;
+        const phone = document.getElementById("phone").value;
+        const signatureUrl = canvas.toDataURL("image/png");
+        const admin = code;
+
+        function isCanvasEmpty(cnv) {
+            const blank = document.createElement("canvas");
+            blank.width = cnv.width;
+            blank.height = cnv.height;
+            return cnv.toDataURL() === blank.toDataURL();
+        }
+
+        if (isCanvasEmpty(canvas)) {
+            alert("⚠️ Debes firmar antes de enviar el formulario.");
+            return;
+        }
+
+        const requiredFields = { name, birth, phone };
+        for (let field in requiredFields) {
+            if (!requiredFields[field]) {
+                alert("⚠️ Por favor, completa todos los campos antes de enviar.");
+                return;
+            }
+        }
+
+        this.disabled = true;
+
+        const formData = new FormData();
+        formData.append("entry.1056316806", name);
+        formData.append("entry.793849116", birth);
+        formData.append("entry.294998651", phone);
+        formData.append("entry.619634509", signatureUrl);
+        formData.append("entry.1679110239", admin);
+
+
+
+        fetch("https://docs.google.com/forms/d/e/1FAIpQLSe33mCMh58N1MUlbx0ZvvfhU4XMlhaOF9luuw-AnwBuDYPK4g/formResponse", {
+            method: "POST",
+            body: formData,
+            mode: "no-cors"
+        }).then(() => {
+            showModal();
+            document.getElementById("name").value = "";
+            document.getElementById("dateOfBirth").value = "";
+            document.getElementById("phone").value = "";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            savedCanvasData = null;
+        }).catch(() => {
+            console.log("⚠️ Ocurrió un error al enviar el formulario. Por favor, intenta nuevamente.");
+        });
+    });
+
+    function showModal() {
+        document.getElementById("thankYouModal").style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("thankYouModal").style.display = "none";
+        location.reload();
+        window.scrollTo(0, 0);
+    }
+
+
+document.getElementById("spinner").style.display = "flex"; // mostrar spinner
+
+    // ✅ NUEVO: obtener datos dinámicos enviando el código al backend
+document.getElementById("spinner").style.display = "flex"; // mostrar spinner
+
+fetch("https://script.google.com/macros/s/AKfycbwT3ZgTppr9KbSzoAAiLJK4nuCDJPvi8pOivZmFjd2zSO8TnqWZCraqL-GnkYyVRZRp/exec?code=" + code)
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById("dinamycTitle").textContent = data.title;
+    document.getElementById("dinamycText").textContent = data.text;
+    document.getElementById("dinamycQuestion").textContent = data.question;
+
+    document.getElementById("spinner").style.display = "none"; // ocultar spinner
+  })
+  .catch(error => {
+    console.error("Error loading data:", error);
+    alert("⚠️ No se pudieron cargar los datos. Por favor, verifica el enlace.");
+  })
+
+</script>
+
+</body>
+</html>
