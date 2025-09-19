@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petition of Support - The Vista An Phu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .edit-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+        
+        .edit-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .petition-content {
+            padding: 30px;
+        }
+        
+        .edit-mode .petition-content {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            margin: 15px;
+        }
+        
+        .petition-text {
+            margin-bottom: 20px;
+        }
+        
+        .edit-textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: vertical;
+            margin-bottom: 15px;
+            display: none;
+            font-family: inherit;
+        }
+        
+        /* Nuevos estilos para el editor de texto enriquecido */
+        .editor-container {
+            display: none;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .edit-mode .editor-container {
+            display: block;
+        }
+        
+        .edit-mode .petition-text {
+            display: none;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .toolbar button {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .toolbar button:hover {
+            background: #e9ecef;
+        }
+        
+        .toolbar button.active {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .rich-text-editor {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 6px 6px;
+            font-size: 16px;
+            line-height: 1.5;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .rich-text-editor:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .edit-controls {
+            display: none;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .edit-mode .edit-controls {
+            display: flex;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-save {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #219653;
+        }
+        
+        .btn-cancel {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: #c0392b;
+        }
+        
+        .form-container2 {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px 0;
+            position: relative;
+            width: 100%;
+            max-width: 520px; /* ancho máximo del bloque (ajustalo si querés) */
+            box-sizing: border-box;
+        }
+
+        .form-container2 input[type="text"],
+        .form-container2 input[type="tel"],
+        .form-container2 input[type="date"],
+        .form-container2 textarea,
+        .form-container2 canvas {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Centrar y limitar ancho del botón de envío */
+        .submit-btn {
+            max-width: 520px;
+            width: 100%;
+            margin: 15px auto 0;
+            display: block;
+        }
+                
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="tel"],
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .signature-container {
+            margin: 20px 0;
+            text-align: center;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra horizontalmente */
+        }
+        
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 500px;
+            touch-action: none;
+        }
+        
+        .clear-btn {
+            background: #95a5a6;
+            color: white;
+            margin: 10px 0;
+        }
+        
+        .clear-btn:hover {
+            background: #7f8c8d;
+        }
+        
+        .submit-btn {
+            background: #3498db;
+            color: white;
+            width: 100%;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .submit-btn:hover {
+            background: #2980b9;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        /* Estilos para elementos editables del header */
+        .header-edit {
+            display: none;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .edit-mode .header-display {
+            display: none;
+        }
+        
+        .edit-mode .header-edit {
+            display: block;
+        }
+        
+        .header-edit input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .header-edit input.subtitle-input {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        /* Modal de agradecimiento */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal h2 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        
+        .modal p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .modal-close {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .modal-close:hover {
+            background: #2980b9;
+        }
+        
+        /* Modal de carga de configuración */
+        #configLoadingModal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .config-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        .config-message {
+            font-size: 18px;
+            text-align: center;
+            max-width: 80%;
+            margin-bottom: 20px;
+        }
+        
+        .config-error {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .config-retry-btn {
+            display: none;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        
+        .config-retry-btn:hover {
+            background: #2980b9;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Nuevos estilos para la adaptación */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        .warning {
+            display: none;
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        #errorMessage {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        #formRoot {
+            display: block;
+        }
+        
+        #ty {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        /* Estilos para el diseño de formulario en columnas */
+        .form-columns {
+            display: flex;
+            flex-direction: column; /* apila los bloques uno debajo del otro */
+            align-items: center;    /* centra horizontalmente */
+            gap: 20px;              /* espacio entre bloques */
+            padding: 10px 20px;
+        }
+
+        /* Nuevos estilos para centrar el contenedor de firma */
+        #signatureContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            .form-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .edit-controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .header-edit input {
+                font-size: 22px;
+            }
+            
+            .header-edit input.subtitle-input {
+                font-size: 16px;
+            }
+            
+            .toolbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal de carga de configuración -->
+    <div id="configLoadingModal">
+        <div class="config-spinner"></div>
+        <div class="config-message">Loading petition configuration...</div>
+        <div class="config-error" id="configError">
+            Error loading configuration. Using default petition text.
+        </div>
+        <button class="config-retry-btn" id="configRetryBtn">Retry</button>
+    </div>
+
+    <div class="container" id="mainContainer" style="display: none;">
+        <header>
+            <div class="header-display">
+                <h1 id="headerTitle">PETITION OF SUPPORT AND AGREEMENT</h1>
+                <p class="subtitle" id="headerSubtitle">The Vista An Phu - Management Board Dismissal</p>
+            </div>
+            
+            <div class="header-edit">
+                <input type="text" id="headerTitleEdit" class="title-input" placeholder="Título de la petición">
+                <input type="text" id="headerSubtitleEdit" class="subtitle-input" placeholder="Subtítulo de la petición">
+            </div>
+            
+            <button class="edit-toggle" id="editToggle">
+                <i class="fas fa-edit"></i> Edit Mode
+            </button>
+        </header>
+        
+        <div class="petition-content">
+            <div class="petition-text" id="petitionText">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            
+            <!-- Editor de texto enriquecido -->
+            <div class="editor-container">
+                <div class="toolbar">
+                    <button id="boldBtn" title="Negrita"><i class="fas fa-bold"></i></button>
+                    <button id="underlineBtn" title="Subrayado"><i class="fas fa-underline"></i></button>
+                </div>
+                <div class="rich-text-editor" id="richTextEditor" contenteditable="true"></div>
+            </div>
+            
+            <div class="edit-controls">
+                <button class="btn-save" id="saveBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="btn-cancel" id="cancelBtn">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+            
+            <div class="alert alert-success" id="alertSuccess">
+                <i class="fas fa-check-circle"></i> Changes saved successfully!
+            </div>
+            
+            <div class="alert alert-error" id="alertError">
+                <i class="fas fa-exclamation-circle"></i> Error saving changes. Please try again.
+            </div>
+        </div>
+        
+        <div id="formRoot">
+            <div class="form-columns">
+                <div class="form-container2" id="guestNameContainer">
+                    <label for="guestName">Guest Name:</label>
+                    <input type="text" id="guestName" name="guestName" required>
+                    <div class="warning">Please enter your name</div>
+                </div>
+                
+                <div class="form-container2" id="dateContainer">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                    <div class="warning">Please select a date</div>
+                </div>
+            </div>
+            
+            <div class="form-container2" id="signatureContainer">
+                <label>Signature:</label>
+                <canvas id="signature" width="500" height="200"></canvas>
+                <div class="warning">Please provide your signature</div>
+                <button class="clear-btn" id="clearButton">
+                    <i class="fas fa-eraser"></i> Clear Signature
+                </button>
+            </div>
+            
+            <div id="errorMessage"></div>
+            
+            <button class="submit-btn" id="submit">
+                <i class="fas fa-paper-plane"></i> Submit
+            </button>
+        </div>
+        
+        <div id="ty" style="display: none;">
+            <h2>Thank You!</h2>
+            <p>Your signature has been successfully submitted. Thank you for supporting our petition.</p>
+        </div>
+        
+        <footer>
+            <p>The Vista An Phu Resident Committee © 2023 | For support, please contact: support@vistaanphu.org</p>
+        </footer>
+    </div>
+
+    <!-- Overlay de carga -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Submitting your form, please wait...</p>
+    </div>
+
+    <script>
+        // Contenido predeterminado hardcodeado
+        const DEFAULT_CONFIG = {
+            title: "PETITION OF SUPPORT AND AGREEMENT",
+            subtitle: "The Vista An Phu - Management Board Dismissal",
+            content: `PETITION OF SUPPORT AND AGREEMENT
+
+Re: DISMISSAL OF THE INCUMBENT MANAGEMENT BOARD OF THE VISTA AN PHU APARTMENT COMPLEX -- DISTRICT 2
+
+The Management Board ('BQT') of The Vista An Phu, District 2, has shown signs of violations during its operations, significantly affecting the rights of the residents of The Vista An Phu, District 2, specifically as follows:
+
+I. A Series of Financial Violations and Operational Regulation Breaches by the Management Board:
+1. Providing false information in the 2024 AGC (Apartment General Conference)
+   - Case of replacing the Control Parking system: Ky Nguyen Sang Tao repeatedly explained that the software was not faulty and suggested rechecking issues like full disk drives, performing data backups, freeing up disk space, and updating the software. Ky Nguyen Sang Tao
+2. Arbitrarily adjusting the content of ballots in the 2024 AGC
+2. The Management Board intentionally did not review the issue raised by residents regarding the unreasonable increase in Management Fees ('PQL'), and did not put this issue to a vote in the 2023 Apartment General Conference ('AGC'), leading to management fees not being voted on. This violates the law, as stipulated in:
+   ● Point c, Clause 4, Article 66 of Decorate 139/2017/ND-CP, which states "a fine from 50,000,000 - 60,000,000 VND for the Management Board of an apartment building committing one of the following acts: ... Unilaterally deciding the price of apartment building management and operation services without approval from the AGC".
+   ● Point c, Clause 1, Article 104 of the 2014 Housing Law: "Proposing the AGC to approve the price of apartment building management and operation services".
+3. Nearly 10 billion VND of Management Fees were misused for maintenance work despite lacking resident approval (data provided by Savills in October 2020), violating Clause 1, Article 10 of Circular 02/2016/TT-BXD regulating the scope of work for the management fund.
+5. The operational regulations, financial regulations, and 2024 resident handbook, although approved by the AGC, were not published on any communication channel at The Vista An Phu, including notice boards in the lobbies, email announcements sent so far, or the Management Board/Management Committee's Facebook group. Official resident representatives requested the publication of these regulations (email dated 03/11/2020 sent to the Management Board's email: bqt.masteri.thaodien@gmail.com) but the Management Board intentionally did not respond and did not provide the requested documents, thus the Management Board violated Clause 1, Article 24 of Circular 02/2016/TT-BXD which requires "...publicity, transparency, compliance with the provisions of this Regulation...".
+
+II. The Management Board Lacks Professionalism and Integrity:
+1. Used the authority of the Management Board multiple times to cause division, insult residents, and obstruct residents from exercising their right to supervise the activities of the Management Committee and the Management Board.
+2. Within the Management Board, there are 02 Vice-Chairmen who are both Lawyers but did not use their legal knowledge and understanding, and their role as the Management Board - representing the rights of residents - to resolve issues related to Circular 02/2016/TT-BXD, leading to delays in requesting the People's Committee to organize an extraordinary AGC as per Point a, Clause 5, Article 14 of Circular 02/2016/TT-BXD; this intentional delay lasted from July 2019 to October 2020 (15 months), hindering the receipt of the maintenance fund and causing losses in resident deposit interest, estimated at a loss of 405 million VND per month (based on estimates in document No. 0104/2019-BQT issued by the Management Board itself).
+
+III. Lack of Responsibility and Transparency in Communication with Residents:
+1. All periodic meeting minutes of the Management Board have not been disclosed to residents, violating Article IV.7 of the Management Board's operational regulations which requires "Immediately after approval, decisions affecting the interests of owners must be announced on the notice board for all residents to know."
+2. The Management Board does not answer important questions from residents (no monthly financial reports for 2 years since the Board was established, the Board's operational regulations not provided to residents), and repeatedly delays and avoids direct dialogue, violating Article II.1.e of the operational regulations: The Management Board must "be responsible to the apartment owners for assigned tasks, comply with the operational regulations, financial revenue and expenditure regulations of the Management Board".
+3. The improper, arrogant attitude of some Management Board members, as reported by many residents in The Vista An Phu Resident Group, where staff and Board members not only did not listen, resolve, explain concerns, or protect the legitimate rights of residents but also repeatedly threatened residents' freedom of speech. Furthermore, Board members lacked standard communication, specifically: The Board insulted residents multiple times when residents recorded and broadcast the weekly meeting (October 17, 2020) but refused to apologize; The Board broke its promise to reorganize meetings with residents and sought to prolong and delay the time for dialogue with Residents.
+4. In February 2025, during a meeting, the Management Board unreasonably demanded to prohibit Board members from disclosing information related to "the activities of the Board, and between the Board and the Management Committee" and this information, unilaterally defined as "confidential information," contrary to Article IV.7 of the Board's operational regulations which states that "Immediately after approval, decisions affecting the interests of owners must be announced on the notice board for all residents to know," meaning this information must be transparent and public.
+The incumbent Head of the Management Board at that time (Mr. Tran Quoc Luu) did not agree with this document, clearly stating that this regulation was not in the mechanism and must wait for resident vote and approval at the AGC. However, the document was still unilaterally passed by the Management Board, raising greater concerns about information transparency; this behavior seriously contradicts Article IV.7 of the Management Board's operational regulations.
+
+Based on the above content, I find that the Management Board does not fulfill its assigned duties and responsibilities and is not qualified to continue its term. The collective residents of The Vista An Phu Apartment Complex propose the dismissal of the entire Management Board and the election of a new Management Board. We, the undersigned representative owners, seek the intervention of the authorities to enforce the provisions of Section 6, Article 15 of Circular 02/2016/TT-BXD guiding "...dismissal of one, several, or all members of the apartment building management board and election of replacement members as stipulated in Clause 2 or Clause 3 and Clause 5 of this Article; if the violator is subject to criminal liability, the apartment general conference shall pass a decision requesting competent authorities to consider and handle criminal liability as per the law. If necessary, the apartment general conference shall decide to establish an inspection team or hire a professional unit to inspect the books and financial revenue and expenditure of the apartment building management board".
+
+After signing, please send to one of the following mailboxes:
+T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T4.A12.04 T5.B33.07`
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const configLoadingModal = document.getElementById('configLoadingModal');
+            const configError = document.getElementById('configError');
+            const configRetryBtn = document.getElementById('configRetryBtn');
+            const mainContainer = document.getElementById('mainContainer');
+            
+            const petitionText = document.getElementById('petitionText');
+            const editToggle = document.getElementById('editToggle');
+            const saveBtn = document.getElementById('saveBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const alertSuccess = document.getElementById('alertSuccess');
+            const alertError = document.getElementById('alertError');
+            
+            // Elementos para el editor de texto enriquecido
+            const richTextEditor = document.getElementById('richTextEditor');
+            const boldBtn = document.getElementById('boldBtn');
+            const underlineBtn = document.getElementById('underlineBtn');
+            
+            // Elementos para el header editable
+            const headerTitle = document.getElementById('headerTitle');
+            const headerSubtitle = document.getElementById('headerSubtitle');
+            const headerTitleEdit = document.getElementById('headerTitleEdit');
+            const headerSubtitleEdit = document.getElementById('headerSubtitleEdit');
+            
+            // Canvas/signature functionality
+            const canvas = document.getElementById("signature");
+            const ctx = canvas.getContext("2d");
+            const clearButton = document.getElementById("clearButton");
+            let drawing = false;
+            
+            // Establecer la fecha actual por defecto
+            document.getElementById('date').valueAsDate = new Date();
+            
+            // URL del backend para guardar/recuperar configuración
+            const CONFIG_BACKEND_URL = "https://script.google.com/macros/s/AKfycbySgIilirVraoDj6ZxSxvDkkUdn9WmYiAJIgldJwk11P-73K16Tg4WEJ-g50WNVdE-Quw/exec";
+            
+            // Función para cargar la configuración desde el backend
+            async function loadConfigFromBackend() {
+                try {
+                    const response = await fetch(`${CONFIG_BACKEND_URL}?action=getConfig`);
+                    const result = await response.json();
+                    
+                    if (result.success && result.config) {
+                        return result.config;
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('Error loading config from backend:', error);
+                    throw error;
+                }
+            }
+            
+            // Función para inicializar la configuración
+            async function initializeConfig() {
+                try {
+                    const config = await loadConfigFromBackend();
+                    
+                    if (config) {
+                        // Usar configuración del backend
+                        petitionText.innerHTML = config.content || DEFAULT_CONFIG.content;
+                        headerTitle.textContent = config.title || DEFAULT_CONFIG.title;
+                        headerSubtitle.textContent = config.subtitle || DEFAULT_CONFIG.subtitle;
+                    } else {
+                        // Usar configuración predeterminada
+                        useDefaultConfig();
+                    }
+                    
+                    // Actualizar campos de edición
+                    headerTitleEdit.value = headerTitle.textContent;
+                    headerSubtitleEdit.value = headerSubtitle.textContent;
+                    
+                    // Ocultar modal y mostrar contenido
+                    configLoadingModal.style.display = 'none';
+                    mainContainer.style.display = 'block';
+                    
+                } catch (error) {
+                    // Error al cargar configuración
+                    configError.style.display = 'block';
+                    configRetryBtn.style.display = 'block';
+                    
+                    // Usar configuración predeterminada
+                    useDefaultConfig();
+                    
+                    // Ocultar modal y mostrar contenido después de un breve retraso
+                    setTimeout(() => {
+                        configLoadingModal.style.display = 'none';
+                        mainContainer.style.display = 'block';
+                    }, 2000);
+                }
+            }
+            
+            // Función para usar la configuración predeterminada
+            function useDefaultConfig() {
+                petitionText.innerHTML = DEFAULT_CONFIG.content;
+                headerTitle.textContent = DEFAULT_CONFIG.title;
+                headerSubtitle.textContent = DEFAULT_CONFIG.subtitle;
+            }
+            
+            // Inicializar la configuración al cargar la página
+            initializeConfig();
+            
+            // Botón para reintentar carga de configuración
+            configRetryBtn.addEventListener('click', function() {
+                configError.style.display = 'none';
+                configRetryBtn.style.display = 'none';
+                initializeConfig();
+            });
+            
+            // Check if we're in edit mode from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEditMode = urlParams.get('edit') === 'true';
+            
+            if (isEditMode) {
+                enableEditMode();
+            }
+            
+            // Edit mode toggle
+            editToggle.addEventListener('click', function() {
+                if (mainContainer.classList.contains('edit-mode')) {
+                    disableEditMode();
+                    // Update URL without edit parameter
+                    history.replaceState({}, '', window.location.pathname);
+                } else {
+                    enableEditMode();
+                    // Update URL with edit parameter
+                    history.replaceState({}, '', window.location.pathname + '?edit=true');
+                }
+            });
+            
+            function enableEditMode() {
+                mainContainer.classList.add('edit-mode');
+                richTextEditor.innerHTML = petitionText.innerHTML;
+                headerTitleEdit.value = headerTitle.textContent;
+                headerSubtitleEdit.value = headerSubtitle.textContent;
+                editToggle.innerHTML = '<i class="fas fa-times"></i> View Mode';
+            }
+            
+            function disableEditMode() {
+                mainContainer.classList.remove('edit-mode');
+                editToggle.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
+            }
+            
+            // Funcionalidad para botones de formato
+            boldBtn.addEventListener('click', function() {
+                document.execCommand('bold', false, null);
+                updateButtonState();
+            });
+            
+            underlineBtn.addEventListener('click', function() {
+                document.execCommand('underline', false, null);
+                updateButtonState();
+            });
+            
+            function updateButtonState() {
+                // Actualizar estado de los botones
+                boldBtn.classList.toggle('active', document.queryCommandState('bold'));
+                underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
+            }
+            
+            // Eventos para actualizar el estado de los botones
+            richTextEditor.addEventListener('mouseup', updateButtonState);
+            richTextEditor.addEventListener('keyup', updateButtonState);
+            
+            // Función para guardar la configuración en el backend
+            async function saveConfigToBackend(config) {
+                try {
+                    const response = await fetch(CONFIG_BACKEND_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8'
+                        },
+                        body: JSON.stringify({
+                            action: 'saveConfig',
+                            config: config
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    return result.success;
+                } catch (error) {
+                    console.error('Error saving config to backend:', error);
+                    return false;
+                }
+            }
+            
+            // Save content
+            saveBtn.addEventListener('click', async function() {
+                try {
+                    petitionText.innerHTML = richTextEditor.innerHTML;
+                    headerTitle.textContent = headerTitleEdit.value;
+                    headerSubtitle.textContent = headerSubtitleEdit.value;
+                    
+                    // Guardar en el backend
+                    const config = {
+                        content: richTextEditor.innerHTML,
+                        title: headerTitleEdit.value,
+                        subtitle: headerSubtitleEdit.value
+                    };
+                    
+                    const saveSuccess = await saveConfigToBackend(config);
+                    
+                    if (saveSuccess) {
+                        // Show success message
+                        alertSuccess.style.display = 'block';
+                        alertError.style.display = 'none';
+                        
+                        // Hide success message after 3 seconds
+                        setTimeout(() => {
+                            alertSuccess.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        throw new Error('Failed to save to backend');
+                    }
+                } catch (error) {
+                    // Show error message
+                    alertError.style.display = 'block';
+                    alertSuccess.style.display = 'none';
+                    
+                    // Hide error message after 3 seconds
+                    setTimeout(() => {
+                        alertError.style.display = 'none';
+                    }, 3000);
+                }
+            });
+            
+            // Cancel editing
+            cancelBtn.addEventListener('click', function() {
+                richTextEditor.innerHTML = petitionText.innerHTML;
+                headerTitleEdit.value = headerTitle.textContent;
+                headerSubtitleEdit.value = headerSubtitle.textContent;
+                disableEditMode();
+                history.replaceState({}, '', window.location.pathname);
+            });
+            
+            // Canvas drawing functionality
+            function resizeCanvas() {
+                const maxWidth = 500;
+                const width = Math.min(window.innerWidth * 0.9, maxWidth);
+                canvas.width = width;
+                canvas.height = width * 0.4;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            function getCanvasPosition() {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    offsetX: rect.left,
+                    offsetY: rect.top
+                };
+            }
+            
+            // Mouse events
+            canvas.addEventListener("mousedown", startDrawing);
+            canvas.addEventListener("mouseup", stopDrawing);
+            canvas.addEventListener("mousemove", draw);
+            
+            // Touch events
+            canvas.addEventListener("touchstart", startDrawingTouch);
+            canvas.addEventListener("touchend", stopDrawingTouch);
+            canvas.addEventListener("touchmove", drawTouch);
+            
+            function startDrawing(e) {
+                drawing = true;
+                ctx.beginPath();
+                draw(e);
+            }
+            
+            function startDrawingTouch(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const canvasPos = getCanvasPosition();
+                startDrawing({
+                    offsetX: touch.clientX - canvasPos.offsetX,
+                    offsetY: touch.clientY - canvasPos.offsetY
+                });
+            }
+            
+            function stopDrawing() {
+                drawing = false;
+                ctx.beginPath();
+            }
+            
+            function stopDrawingTouch(e) {
+                e.preventDefault();
+                if (e.touches.length === 0) {
+                    stopDrawing();
+                }
+            }
+            
+            function draw(e) {
+                if (!drawing) return;
+                const x = e.offsetX;
+                const y = e.offsetY;
+                ctx.lineWidth = 2;
+                ctx.lineCap = "round";
+                ctx.strokeStyle = "black";
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+            
+            function drawTouch(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const canvasPos = getCanvasPosition();
+                draw({
+                    offsetX: touch.clientX - canvasPos.offsetX,
+                    offsetY: touch.clientY - canvasPos.offsetY
+                });
+            }
+            
+            // Clear canvas
+            clearButton.addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+            
+            // Función para mostrar errores
+            function showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                
+                // Ocultar después de 5 segundos
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Función de envío adaptada
+            async function send() {
+                const submitBtn = document.getElementById("submit");
+                const overlay = document.getElementById("loadingOverlay");
+                const errorDiv = document.getElementById('errorMessage');
+
+                errorDiv.style.display = 'none';
+                submitBtn.disabled = true;
+                overlay.style.display = "flex";
+
+                let hasError = false;
+                let firstErrorElement = null;
+                const payload = {};
+
+                // Recorremos todos los form-container2 dinámicos
+                document.querySelectorAll(".form-container2").forEach(container => {
+                    const input = container.querySelector("input, textarea, select, canvas");
+                    if (!input) return;
+
+                    const name = input.name || container.id;
+                    const warning = container.querySelector(".warning");
+
+                    let value;
+                    let isEmpty = false;
+
+                    if (input.tagName === "CANVAS") {
+                        // Verificar si el canvas de firma está vacío
+                        const ctx = input.getContext("2d");
+                        const imageData = ctx.getImageData(0, 0, input.width, input.height).data;
+                        isEmpty = true;
+
+                        for (let i = 0; i < imageData.length; i += 4) {
+                            if (imageData[i + 3] !== 0) {
+                                isEmpty = false;
+                                break;
+                            }
+                        }
+
+                        if (!isEmpty) {
+                            value = {
+                                filename: `signature_${Date.now()}.png`,
+                                mimeType: "image/png",
+                                data: input.toDataURL("image/png").split(",")[1]
+                            };
+                        }
+                    } else if (input.type === "radio" || input.type === "checkbox") {
+                        const checked = container.querySelectorAll("input:checked");
+                        isEmpty = checked.length === 0;
+
+                        if (!isEmpty) {
+                            value = [...checked].map(el => el.value);
+                            if (input.type === "radio") value = value[0]; // un único valor
+                        }
+                    } else if (input.tagName === "SELECT") {
+                        // Dropdown
+                        isEmpty = input.value === "";
+                        value = input.value;
+                    } else {
+                        // Texto, textarea, fecha, hora
+                        value = input.value.trim();
+                        isEmpty = !value;
+                    }
+
+                    // Mostrar advertencias
+                    if (isEmpty && warning) {
+                        warning.style.display = "block";
+                        hasError = true;
+                        if (!firstErrorElement) firstErrorElement = container;
+                    } else if (warning) {
+                        warning.style.display = "none";
+                    }
+
+                    payload[name] = value;
+                });
+
+                if (hasError) {
+                    if (firstErrorElement) {
+                        firstErrorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                    submitBtn.disabled = false;
+                    overlay.style.display = "none";
+                    return;
+                }
+
+                try {
+                    const response = await fetch(CONFIG_BACKEND_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        document.getElementById("formRoot").style.display = "none";
+                        document.getElementById("ty").style.display = "block";
+                    } else {
+                        showError("Error al enviar los datos: " + result.error);
+                    }
+
+                } catch (err) {
+                    console.error("Error al enviar datos:", err);
+                    showError("Error de conexión. Por favor, intenta nuevamente.");
+                } finally {
+                    submitBtn.disabled = false;
+                    overlay.style.display = "none";
+                }
+            }
+            
+            // Event listener para el botón de envío
+            document.getElementById("submit").addEventListener("click", send);
+        });
+    </script>
+</body>
+</html>
