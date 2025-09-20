@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petition of Support - The Vista An Phu</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -49,10 +51,31 @@
             opacity: 0.9;
         }
         
-        .edit-toggle {
+.edit-toggle, .view-responses-btn {
+    position: absolute;
+    top: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.3s;
+    z-index: 10;
+}
+        
+        .edit-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .view-responses-btn {
             position: absolute;
             top: 10px;
-            right: 10px;
+            right: 90px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
@@ -66,7 +89,7 @@
             transition: background 0.3s;
         }
         
-        .edit-toggle:hover {
+        .view-responses-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
         
@@ -402,6 +425,91 @@
             display: none;
         }
         
+        /* Modal de respuestas */
+        .responses-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .responses-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .responses-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .responses-list {
+            margin-top: 20px;
+        }
+        
+        .response-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .response-name {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .response-date {
+            color: #7f8c8d;
+        }
+        
+        .response-signature {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .response-signature img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .response-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .no-responses {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+        
         /* Modal de agradecimiento */
         .modal {
             display: none;
@@ -612,12 +720,48 @@
                 flex-wrap: wrap;
             }
             
-            .edit-toggle {
-                top: 5px;
-                right: 5px;
-                padding: 4px 8px;
-                font-size: 11px;
+    .edit-toggle, .view-responses-btn {
+        position: absolute;
+        width: calc(100% - 40px);
+        left: 20px;
+        justify-content: center;
+        padding: 12px;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+                .edit-toggle {
+        top: auto;
+        bottom: 60px;
+        right: auto;
+    }
+                .view-responses-btn {
+        top: auto;
+        bottom: 10px;
+        right: auto;
+    }
+            .responses-modal-content {
+                padding: 15px;
             }
+            
+            .response-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .response-actions {
+                flex-direction: column;
+            }
+
+
+                header {
+        padding-bottom: 70px; /* Más espacio para los botones en móvil */
+        position: relative;
+    }
+    .edit-toggle i, .view-responses-btn i {
+        font-size: 18px;
+    }
+
         }
     </style>
 </head>
@@ -635,6 +779,21 @@
                 </button>
                 <button class="btn-cancel" id="authCancel">
                     <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de respuestas -->
+    <div class="responses-modal" id="responsesModal">
+        <div class="responses-modal-content">
+            <h2>Submitted Responses</h2>
+            <div class="responses-list" id="responsesList">
+                <div class="no-responses">Loading responses...</div>
+            </div>
+            <div class="response-actions">
+                <button class="btn-cancel" id="closeResponses">
+                    <i class="fas fa-times"></i> Close
                 </button>
             </div>
         </div>
@@ -661,6 +820,10 @@
                 <input type="text" id="headerTitleEdit" class="title-input" placeholder="Título de la petición">
                 <input type="text" id="headerSubtitleEdit" class="subtitle-input" placeholder="Subtítulo de la petición">
             </div>
+            
+            <button class="view-responses-btn" id="viewResponsesBtn" style="display: none;">
+                <i class="fas fa-list"></i> Responses
+            </button>
             
             <button class="edit-toggle" id="editToggle">
                 <i class="fas fa-edit"></i> Edit
@@ -743,45 +906,15 @@
     <!-- Overlay de carga -->
     <div id="loadingOverlay">
         <div class="spinner"></div>
-        <p>Submitting your form, please wait...</p>
+        <p>Submitting your response, please wait...</p>
     </div>
 
     <script>
         // Contenido predeterminado hardcodeado
         const DEFAULT_CONFIG = {
-            title: "PETITION OF SUPPORT AND AGREEMENT",
-            subtitle: "The Vista An Phu - Management Board Dismissal",
-            content: `PETITION OF SUPPORT AND AGREEMENT
-
-Re: DISMISSAL OF THE INCUMBENT MANAGEMENT BOARD OF THE VISTA AN PHU APARTMENT COMPLEX -- DISTRICT 2
-
-The Management Board ('BQT') of The Vista An Phu, District 2, has shown signs of violations during its operations, significantly affecting the rights of the residents of The Vista An Phu, District 2, specifically as follows:
-
-I. A Series of Financial Violations and Operational Regulation Breaches by the Management Board:
-1. Providing false information in the 2024 AGC (Apartment General Conference)
-   - Case of replacing the Control Parking system: Ky Nguyen Sang Tao repeatedly explained that the software was not faulty and suggested rechecking issues like full disk drives, performing data backups, freeing up disk space, and updating the software. Ky Nguyen Sang Tao
-2. Arbitrarily adjusting the content of ballots in the 2024 AGC
-2. The Management Board intentionally did not review the issue raised by residents regarding the unreasonable increase in Management Fees ('PQL'), and did not put this issue to a vote in the 2023 Apartment General Conference ('AGC'), leading to management fees not being voted on. This violates the law, as stipulated in:
-   ● Point c, Clause 4, Article 66 of Decorate 139/2017/ND-CP, which states "a fine from 50,000,000 - 60,000,000 VND for the Management Board of an apartment building committing one of the following acts: ... Unilaterally deciding the price of apartment building management and operation services without approval from the AGC".
-   ● Point c, Clause 1, Article 104 of the 2014 Housing Law: "Proposing the AGC to approve the price of apartment building management and operation services".
-3. Nearly 10 billion VND of Management Fees were misused for maintenance work despite lacking resident approval (data provided by Savills in October 2020), violating Clause 1, Article 10 of Circular 02/2016/TT-BXD regulating the scope of work for the management fund.
-5. The operational regulations, financial regulations, and 2024 resident handbook, although approved by the AGC, were not published on any communication channel at The Vista An Phu, including notice boards in the lobbies, email announcements sent so far, or the Management Board/Management Committee's Facebook group. Official resident representatives requested the publication of these regulations (email dated 03/11/2020 sent to the Management Board's email: bqt.masteri.thaodien@gmail.com) but the Management Board intentionally did not respond and did not provide the requested documents, thus the Management Board violated Clause 1, Article 24 of Circular 02/2016/TT-BXD which requires "...publicity, transparency, compliance with the provisions of this Regulation...".
-
-II. The Management Board Lacks Professionalism and Integrity:
-1. Used the authority of the Management Board multiple times to cause division, insult residents, and obstruct residents from exercising their right to supervise the activities of the Management Committee and the Management Board.
-2. Within the Management Board, there are 02 Vice-Chairmen who are both Lawyers but did not use their legal knowledge and understanding, and their role as the Management Board - representing the rights of residents - to resolve issues related to Circular 02/2016/TT-BXD, leading to delays in requesting the People's Committee to organize an extraordinary AGC as per Point a, Clause 5, Article 14 of Circular 02/2016/TT-BXD; this intentional delay lasted from July 2019 to October 2020 (15 months), hindering the receipt of the maintenance fund and causing losses in resident deposit interest, estimated at a loss of 405 million VND per month (based on estimates in document No. 0104/2019-BQT issued by the Management Board itself).
-
-III. Lack of Responsibility and Transparency in Communication with Residents:
-1. All periodic meeting minutes of the Management Board have not been disclosed to residents, violating Article IV.7 of the Management Board's operational regulations which requires "Immediately after approval, decisions affecting the interests of owners must be announced on the notice board for all residents to know."
-2. The Management Board does not answer important questions from residents (no monthly financial reports for 2 years since the Board was established, the Board's operational regulations not provided to residents), and repeatedly delays and avoids direct dialogue, violating Article II.1.e of the operational regulations: The Management Board must "be responsible to the apartment owners for assigned tasks, comply with the operational regulations, financial revenue and expenditure regulations of the Management Board".
-3. The improper, arrogant attitude of some Management Board members, as reported by many residents in The Vista An Phu Resident Group, where staff and Board members not only did not listen, resolve, explain concerns, or protect the legitimate rights of residents but also repeatedly threatened residents' freedom of speech. Furthermore, Board members lacked standard communication, specifically: The Board insulted residents multiple times when residents recorded and broadcast the weekly meeting (October 17, 2020) but refused to apologize; The Board broke its promise to reorganize meetings with residents and sought to prolong and delay the time for dialogue with Residents.
-4. In February 2025, during a meeting, the Management Board unreasonably demanded to prohibit Board members from disclosing information related to "the activities of the Board, and between the Board and the Management Committee" and this information, unilaterally defined as "confidential information," contrary to Article IV.7 of the Board's operational regulations which states that "Immediately after approval, decisions affecting the interests of owners must be announced on the notice board for all residents to know," meaning this information must be transparent and public.
-The incumbent Head of the Management Board at that time (Mr. Tran Quoc Luu) did not agree with this document, clearly stating that this regulation was not in the mechanism and must wait for resident vote and approval at the AGC. However, the document was still unilaterally passed by the Management Board, raising greater concerns about information transparency; this behavior seriously contradicts Article IV.7 of the Management Board's operational regulations.
-
-Based on the above content, I find that the Management Board does not fulfill its assigned duties and responsibilities and is not qualified to continue its term. The collective residents of The Vista An Phu Apartment Complex propose the dismissal of the entire Management Board and the election of a new Management Board. We, the undersigned representative owners, seek the intervention of the authorities to enforce the provisions of Section 6, Article 15 of Circular 02/2016/TT-BXD guiding "...dismissal of one, several, or all members of the apartment building management board and election of replacement members as stipulated in Clause 2 or Clause 3 and Clause 5 of this Article; if the violator is subject to criminal liability, the apartment general conference shall pass a decision requesting competent authorities to consider and handle criminal liability as per the law. If necessary, the apartment general conference shall decide to establish an inspection team or hire a professional unit to inspect the books and financial revenue and expenditure of the apartment building management board".
-
-After signing, please send to one of the following mailboxes:
-T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T4.A12.04 T5.B33.07`
+            title: "SIGNATURE FORM",
+            subtitle: "",
+            content: ``
         };
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -790,6 +923,11 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
             const authError = document.getElementById('authError');
             const authSubmit = document.getElementById('authSubmit');
             const authCancel = document.getElementById('authCancel');
+            
+            const responsesModal = document.getElementById('responsesModal');
+            const responsesList = document.getElementById('responsesList');
+            const viewResponsesBtn = document.getElementById('viewResponsesBtn');
+            const closeResponses = document.getElementById('closeResponses');
             
             const configLoadingModal = document.getElementById('configLoadingModal');
             const configError = document.getElementById('configError');
@@ -824,7 +962,7 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
             document.getElementById('date').valueAsDate = new Date();
             
             // URL del backend para guardar/recuperar configuración
-            const CONFIG_BACKEND_URL = "https://script.google.com/macros/s/AKfycbySgIilirVraoDj6ZxSxvDkkUdn9WmYiAJIgldJwk11P-73K16Tg4WEJ-g50WNVdE-Quw/exec";
+            const CONFIG_BACKEND_URL = "https://script.google.com/macros/s/AKfycbxxQkdD4R91TVgCueQzlaBbYsszTrTbqtcE4UdtaxAQQ_vIsNNaYM4CXvwu_CkgyUyhzw/exec";
             
             // Función para cargar la configuración desde el backend
             async function loadConfigFromBackend() {
@@ -916,6 +1054,16 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
                 }
             });
             
+            // Mostrar modal de respuestas
+            viewResponsesBtn.addEventListener('click', function() {
+                showResponsesModal();
+            });
+            
+            // Cerrar modal de respuestas
+            closeResponses.addEventListener('click', function() {
+                responsesModal.style.display = 'none';
+            });
+            
             // Mostrar modal de autenticación
             function showAuthModal() {
                 authModal.style.display = 'flex';
@@ -927,6 +1075,12 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
             // Ocultar modal de autenticación
             function hideAuthModal() {
                 authModal.style.display = 'none';
+            }
+            
+            // Mostrar modal de respuestas
+            function showResponsesModal() {
+                responsesModal.style.display = 'flex';
+                loadResponses();
             }
             
             // Verificar contraseña
@@ -943,18 +1097,165 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
                 }
             }
             
-            // Event listeners para autenticación
-            authSubmit.addEventListener('click', checkPassword);
-            
-            authCancel.addEventListener('click', function() {
-                hideAuthModal();
-            });
-            
-            passwordInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
+            // Cargar respuestas desde el backend
+            async function loadResponses() {
+                responsesList.innerHTML = '<div class="no-responses">Loading responses...</div>';
+                
+                try {
+                    const response = await fetch(`${CONFIG_BACKEND_URL}?action=getResponses`);
+                    const result = await response.json();
+                    
+                    if (result.success && result.responses && result.responses.length > 0) {
+                        displayResponses(result.responses);
+                    } else {
+                        responsesList.innerHTML = '<div class="no-responses">No responses found.</div>';
+                    }
+                } catch (error) {
+                    console.error('Error loading responses:', error);
+                    responsesList.innerHTML = '<div class="no-responses">Error loading responses. Please try again.</div>';
                 }
-            });
+            }
+            
+            // Mostrar respuestas en el modal
+            function displayResponses(responses) {
+                responsesList.innerHTML = '';
+                
+                responses.forEach((response, index) => {
+                    const responseItem = document.createElement('div');
+                    responseItem.className = 'response-item';
+                    
+                    // Formatear la fecha si está disponible
+                    let formattedDate = 'No date provided';
+                    if (response.date) {
+                        const dateObj = new Date(response.date);
+                        if (!isNaN(dateObj.getTime())) {
+                            formattedDate = dateObj.toLocaleDateString();
+                        }
+                    }
+                    
+                    responseItem.innerHTML = `
+                        <div class="response-header">
+                            <div class="response-name">${response.guestName || 'Anonymous'}</div>
+                            <div class="response-date">${formattedDate}</div>
+                        </div>
+                        <div class="response-details">
+                            <p><strong>Name:</strong> ${response.guestName || 'Not provided'}</p>
+                            <p><strong>Date:</strong> ${formattedDate}</p>
+                        </div>
+                        ${response.signatureData ? `
+                        <div class="response-signature">
+                            <p><strong>Signature:</strong></p>
+                            <img src="${response.signatureData}" alt="Signature">
+                        </div>
+                        ` : ''}
+                        <div class="response-actions">
+                            <button class="btn-save download-pdf" data-index="${index}">
+                                <i class="fas fa-download"></i> Download PDF
+                            </button>
+                        </div>
+                    `;
+                    
+                    responsesList.appendChild(responseItem);
+                });
+                
+                // Añadir event listeners a los botones de descarga
+                document.querySelectorAll('.download-pdf').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        generatePDF(responses[index]);
+                    });
+                });
+            }
+            
+            // Generar PDF para una respuesta
+// Generar PDF para una respuesta (función corregida)
+async function generatePDF(response) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Título
+    doc.setFontSize(20);
+    doc.text("PETITION RESPONSE", 105, 20, { align: 'center' });
+    
+    // Línea separadora
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.line(20, 25, 190, 25);
+    
+    // Información de la respuesta
+    doc.setFontSize(12);
+    let yPosition = 35;
+    
+    // Nombre
+    doc.setFont(undefined, 'bold');
+    doc.text("Name:", 20, yPosition);
+    doc.setFont(undefined, 'normal');
+    doc.text(response.guestName || 'Not provided', 60, yPosition);
+    yPosition += 10;
+    
+    // Fecha
+    let formattedDate = 'No date provided';
+    if (response.date) {
+        const dateObj = new Date(response.date);
+        if (!isNaN(dateObj.getTime())) {
+            formattedDate = dateObj.toLocaleDateString();
+        }
+    }
+    
+    doc.setFont(undefined, 'bold');
+    doc.text("Date:", 20, yPosition);
+    doc.setFont(undefined, 'normal');
+    doc.text(formattedDate, 60, yPosition);
+    yPosition += 15;
+    
+    // Firma
+    if (response.signatureData) {
+        doc.setFont(undefined, 'bold');
+        doc.text("Signature:", 20, yPosition);
+        yPosition += 10;
+        
+        try {
+            // Extraer solo la parte base64 del data URI
+            const base64Data = response.signatureData.replace(/^data:image\/png;base64,/, '');
+            
+            // Añadir la imagen de la firma
+            doc.addImage(base64Data, 'PNG', 20, yPosition, 100, 40);
+            yPosition += 50;
+        } catch (error) {
+            console.error('Error adding signature to PDF:', error);
+            doc.text("Error displaying signature", 20, yPosition);
+            yPosition += 10;
+        }
+    }
+    
+    // Línea separadora
+    yPosition += 5;
+    doc.line(20, yPosition, 190, yPosition);
+    yPosition += 10;
+    
+    // Información de la petición
+    doc.setFont(undefined, 'bold');
+    doc.text("Petition Details:", 20, yPosition);
+    yPosition += 10;
+    
+    doc.setFont(undefined, 'normal');
+    const petitionTitle = headerTitle.textContent;
+    const petitionSubtitle = headerSubtitle.textContent;
+    
+    doc.text(`Title: ${petitionTitle}`, 20, yPosition);
+    yPosition += 7;
+    doc.text(`Subtitle: ${petitionSubtitle}`, 20, yPosition);
+    yPosition += 10;
+    
+    // Fecha de generación del PDF
+    const now = new Date();
+    doc.setFontSize(10);
+    doc.text(`PDF generated on: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 20, 280);
+    
+    // Guardar el PDF
+    const fileName = `petition_response_${response.guestName || 'anonymous'}_${formattedDate.replace(/\//g, '-')}.pdf`;
+    doc.save(fileName);
+}
             
             function enableEditMode() {
                 mainContainer.classList.add('edit-mode');
@@ -962,11 +1263,13 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
                 headerTitleEdit.value = headerTitle.textContent;
                 headerSubtitleEdit.value = headerSubtitle.textContent;
                 editToggle.innerHTML = '<i class="fas fa-times"></i> View Mode';
+                viewResponsesBtn.style.display = 'block';
             }
             
             function disableEditMode() {
                 mainContainer.classList.remove('edit-mode');
                 editToggle.innerHTML = '<i class="fas fa-edit"></i> Edit';
+                viewResponsesBtn.style.display = 'none';
             }
             
             // Funcionalidad para botones de formato
@@ -1269,6 +1572,19 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
             
             // Event listener para el botón de envío
             document.getElementById("submit").addEventListener("click", send);
+            
+            // Event listeners para autenticación
+            authSubmit.addEventListener('click', checkPassword);
+            
+            authCancel.addEventListener('click', function() {
+                hideAuthModal();
+            });
+            
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
         });
     </script>
 </body>
