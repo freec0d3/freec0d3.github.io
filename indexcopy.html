@@ -34,6 +34,7 @@
         }
         
         header {
+            
             background: #2c3e50;
             color: white;
             padding: 20px;
@@ -51,8 +52,9 @@
             opacity: 0.9;
         }
         
-.edit-toggle, .view-responses-btn {
+.edit-toggle {
     position: absolute;
+    right: 10px;
     top: 10px;
     background: rgba(255, 255, 255, 0.2);
     color: white;
@@ -67,28 +69,32 @@
     transition: background 0.3s;
     z-index: 10;
 }
+
+.view-responses-btn {
+    position: absolute;
+    right: 200px;
+    top: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.3s;
+    z-index: 10;
+}
+
+
         
         .edit-toggle:hover {
             background: rgba(255, 255, 255, 0.3);
         }
         
-        .view-responses-btn {
-            position: absolute;
-            top: 10px;
-            right: 90px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: background 0.3s;
-        }
-        
+
         .view-responses-btn:hover {
             background: rgba(255, 255, 255, 0.3);
         }
@@ -720,30 +726,33 @@
                 flex-wrap: wrap;
             }
             
-    .edit-toggle, .view-responses-btn {
+    .edit-toggle {
         position: absolute;
-        width: calc(100% - 40px);
-        left: 20px;
-        justify-content: center;
-        padding: 12px;
-        font-size: 16px;
-        margin-bottom: 10px;
+        top: 10px;
+        right: 10px;
+        left: auto;
+        width: auto;
+        padding: 6px 10px;
+        font-size: 12px;
     }
-                .edit-toggle {
-        top: auto;
-        bottom: 60px;
-        right: auto;
-    }
-                .view-responses-btn {
-        top: auto;
-        bottom: 10px;
-        right: auto;
+
+
+                   .view-responses-btn {
+       
+        position: absolute;
+        top: 10px;
+        right: 200px;
+        left: auto;
+        width: auto;
+        padding: 6px 10px;
+        font-size: 12px;
     }
             .responses-modal-content {
                 padding: 15px;
             }
             
             .response-header {
+                 top: 10px;
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 5px;
@@ -761,6 +770,8 @@
     .edit-toggle i, .view-responses-btn i {
         font-size: 18px;
     }
+
+    
 
         }
     </style>
@@ -811,9 +822,10 @@
 
     <div class="container" id="mainContainer" style="display: none;">
         <header>
+            <br>
             <div class="header-display">
-                <h1 id="headerTitle">PETITION OF SUPPORT AND AGREEMENT</h1>
-                <p class="subtitle" id="headerSubtitle">The Vista An Phu - Management Board Dismissal</p>
+                <h1 id="headerTitle"></h1>
+                <p class="subtitle" id="headerSubtitle"></p>
             </div>
             
             <div class="header-edit">
@@ -828,6 +840,7 @@
             <button class="edit-toggle" id="editToggle">
                 <i class="fas fa-edit"></i> Edit
             </button>
+        
         </header>
         
         <div class="petition-content">
