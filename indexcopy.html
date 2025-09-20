@@ -51,18 +51,18 @@
         
         .edit-toggle {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
+            border-radius: 4px;
+            padding: 5px 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             transition: background 0.3s;
         }
         
@@ -212,7 +212,7 @@
             margin: 10px 0;
             position: relative;
             width: 100%;
-            max-width: 520px; /* ancho máximo del bloque (ajustalo si querés) */
+            max-width: 520px;
             box-sizing: border-box;
         }
 
@@ -259,7 +259,7 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centra horizontalmente */
+            align-items: center;
         }
         
         canvas {
@@ -352,6 +352,54 @@
         .header-edit input.subtitle-input {
             font-size: 18px;
             opacity: 0.9;
+        }
+        
+        /* Modal de autenticación */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .auth-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .auth-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .auth-modal input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .auth-modal button {
+            margin: 5px;
+        }
+        
+        .auth-error {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
         }
         
         /* Modal de agradecimiento */
@@ -523,9 +571,9 @@
         /* Estilos para el diseño de formulario en columnas */
         .form-columns {
             display: flex;
-            flex-direction: column; /* apila los bloques uno debajo del otro */
-            align-items: center;    /* centra horizontalmente */
-            gap: 20px;              /* espacio entre bloques */
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
             padding: 10px 20px;
         }
 
@@ -563,10 +611,35 @@
             .toolbar {
                 flex-wrap: wrap;
             }
+            
+            .edit-toggle {
+                top: 5px;
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Modal de autenticación -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <h2>Authentication Required</h2>
+            <p>Please enter the password to enable edit mode:</p>
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+            <div>
+                <button class="btn-save" id="authSubmit">
+                    <i class="fas fa-lock"></i> Submit
+                </button>
+                <button class="btn-cancel" id="authCancel">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de carga de configuración -->
     <div id="configLoadingModal">
         <div class="config-spinner"></div>
@@ -590,7 +663,7 @@
             </div>
             
             <button class="edit-toggle" id="editToggle">
-                <i class="fas fa-edit"></i> Edit Mode
+                <i class="fas fa-edit"></i> Edit
             </button>
         </header>
         
@@ -712,6 +785,12 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
         };
 
         document.addEventListener('DOMContentLoaded', function() {
+            const authModal = document.getElementById('authModal');
+            const passwordInput = document.getElementById('passwordInput');
+            const authError = document.getElementById('authError');
+            const authSubmit = document.getElementById('authSubmit');
+            const authCancel = document.getElementById('authCancel');
+            
             const configLoadingModal = document.getElementById('configLoadingModal');
             const configError = document.getElementById('configError');
             const configRetryBtn = document.getElementById('configRetryBtn');
@@ -824,19 +903,56 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
             const isEditMode = urlParams.get('edit') === 'true';
             
             if (isEditMode) {
-                enableEditMode();
+                showAuthModal();
             }
             
-            // Edit mode toggle
+            // Edit mode toggle - muestra el modal de autenticación
             editToggle.addEventListener('click', function() {
-                if (mainContainer.classList.contains('edit-mode')) {
-                    disableEditMode();
-                    // Update URL without edit parameter
-                    history.replaceState({}, '', window.location.pathname);
+                if (!mainContainer.classList.contains('edit-mode')) {
+                    showAuthModal();
                 } else {
+                    disableEditMode();
+                    history.replaceState({}, '', window.location.pathname);
+                }
+            });
+            
+            // Mostrar modal de autenticación
+            function showAuthModal() {
+                authModal.style.display = 'flex';
+                passwordInput.value = '';
+                authError.style.display = 'none';
+                passwordInput.focus();
+            }
+            
+            // Ocultar modal de autenticación
+            function hideAuthModal() {
+                authModal.style.display = 'none';
+            }
+            
+            // Verificar contraseña
+            function checkPassword() {
+                if (passwordInput.value === 'sava2025') {
+                    hideAuthModal();
                     enableEditMode();
-                    // Update URL with edit parameter
                     history.replaceState({}, '', window.location.pathname + '?edit=true');
+                    return true;
+                } else {
+                    authError.style.display = 'block';
+                    passwordInput.focus();
+                    return false;
+                }
+            }
+            
+            // Event listeners para autenticación
+            authSubmit.addEventListener('click', checkPassword);
+            
+            authCancel.addEventListener('click', function() {
+                hideAuthModal();
+            });
+            
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
                 }
             });
             
@@ -850,7 +966,7 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
             
             function disableEditMode() {
                 mainContainer.classList.remove('edit-mode');
-                editToggle.innerHTML = '<i class="fas fa-edit"></i> Edit Mode';
+                editToggle.innerHTML = '<i class="fas fa-edit"></i> Edit';
             }
             
             // Funcionalidad para botones de formato
@@ -1122,7 +1238,7 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
                         firstErrorElement.scrollIntoView({ behavior: "smooth", block: "center" });
                     }
                     submitBtn.disabled = false;
-                    overlay.style.display = "none";
+                    overlay.style.display = 'none';
                     return;
                 }
 
@@ -1147,7 +1263,7 @@ T1.B29.07 & 29.02 T2.A34.03 T3.A35.10 T4.B20.03 T5.A33.12 T1.B31.08 T2.B19.08, T
                     showError("Error de conexión. Por favor, intenta nuevamente.");
                 } finally {
                     submitBtn.disabled = false;
-                    overlay.style.display = "none";
+                    overlay.style.display = 'none';
                 }
             }
             
