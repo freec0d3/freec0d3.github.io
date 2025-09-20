@@ -970,12 +970,30 @@
             const ctx = canvas.getContext("2d");
             const clearButton = document.getElementById("clearButton");
             let drawing = false;
+            let canvasBackup = null; // Para guardar el estado del canvas
             
             // Establecer la fecha actual por defecto
             document.getElementById('date').valueAsDate = new Date();
             
             // URL del backend para guardar/recuperar configuración
             const CONFIG_BACKEND_URL = "https://script.google.com/macros/s/AKfycbxxQkdD4R91TVgCueQzlaBbYsszTrTbqtcE4UdtaxAQQ_vIsNNaYM4CXvwu_CkgyUyhzw/exec";
+            
+            // Función para guardar el estado actual del canvas
+            function backupCanvas() {
+                canvasBackup = canvas.toDataURL();
+            }
+            
+            // Función para restaurar el estado del canvas
+            function restoreCanvas() {
+                if (canvasBackup) {
+                    const img = new Image();
+                    img.onload = function() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = canvasBackup;
+                }
+            }
             
             // Función para cargar la configuración desde el backend
             async function loadConfigFromBackend() {
@@ -1016,6 +1034,9 @@
                     configLoadingModal.style.display = 'none';
                     mainContainer.style.display = 'block';
                     
+                    // Inicializar eventos para detectar cuando se abre el teclado
+                    initKeyboardEvents();
+                    
                 } catch (error) {
                     // Error al cargar configuración
                     configError.style.display = 'block';
@@ -1028,8 +1049,33 @@
                     setTimeout(() => {
                         configLoadingModal.style.display = 'none';
                         mainContainer.style.display = 'block';
+                        // Inicializar eventos para detectar cuando se abre el teclado
+                        initKeyboardEvents();
                     }, 2000);
                 }
+            }
+            
+            // Inicializar eventos para detectar cuando se abre el teclado
+            function initKeyboardEvents() {
+                // Detectar cuando un campo de entrada obtiene el foco (se va a abrir el teclado)
+                const inputs = document.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', function() {
+                        // Guardar el estado actual del canvas
+                        backupCanvas();
+                    });
+                    
+                    input.addEventListener('blur', function() {
+                        // Restaurar el canvas si se perdió el contenido
+                        setTimeout(restoreCanvas, 300);
+                    });
+                });
+                
+                // También detectar cambios en la orientación o redimensionamiento de la ventana
+                window.addEventListener('resize', function() {
+                    // Restaurar el canvas después de un redimensionamiento
+                    setTimeout(restoreCanvas, 100);
+                });
             }
             
             // Función para usar la configuración predeterminada
@@ -1180,95 +1226,94 @@
                 });
             }
             
-            // Generar PDF para una respuesta
-// Generar PDF para una respuesta (función corregida)
-async function generatePDF(response) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // Título
-    doc.setFontSize(20);
-    doc.text("PETITION RESPONSE", 105, 20, { align: 'center' });
-    
-    // Línea separadora
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.line(20, 25, 190, 25);
-    
-    // Información de la respuesta
-    doc.setFontSize(12);
-    let yPosition = 35;
-    
-    // Nombre
-    doc.setFont(undefined, 'bold');
-    doc.text("Name:", 20, yPosition);
-    doc.setFont(undefined, 'normal');
-    doc.text(response.guestName || 'Not provided', 60, yPosition);
-    yPosition += 10;
-    
-    // Fecha
-    let formattedDate = 'No date provided';
-    if (response.date) {
-        const dateObj = new Date(response.date);
-        if (!isNaN(dateObj.getTime())) {
-            formattedDate = dateObj.toLocaleDateString();
-        }
-    }
-    
-    doc.setFont(undefined, 'bold');
-    doc.text("Date:", 20, yPosition);
-    doc.setFont(undefined, 'normal');
-    doc.text(formattedDate, 60, yPosition);
-    yPosition += 15;
-    
-    // Firma
-    if (response.signatureData) {
-        doc.setFont(undefined, 'bold');
-        doc.text("Signature:", 20, yPosition);
-        yPosition += 10;
-        
-        try {
-            // Extraer solo la parte base64 del data URI
-            const base64Data = response.signatureData.replace(/^data:image\/png;base64,/, '');
-            
-            // Añadir la imagen de la firma
-            doc.addImage(base64Data, 'PNG', 20, yPosition, 100, 40);
-            yPosition += 50;
-        } catch (error) {
-            console.error('Error adding signature to PDF:', error);
-            doc.text("Error displaying signature", 20, yPosition);
-            yPosition += 10;
-        }
-    }
-    
-    // Línea separadora
-    yPosition += 5;
-    doc.line(20, yPosition, 190, yPosition);
-    yPosition += 10;
-    
-    // Información de la petición
-    doc.setFont(undefined, 'bold');
-    doc.text("Petition Details:", 20, yPosition);
-    yPosition += 10;
-    
-    doc.setFont(undefined, 'normal');
-    const petitionTitle = headerTitle.textContent;
-    const petitionSubtitle = headerSubtitle.textContent;
-    
-    doc.text(`Title: ${petitionTitle}`, 20, yPosition);
-    yPosition += 7;
-    doc.text(`Subtitle: ${petitionSubtitle}`, 20, yPosition);
-    yPosition += 10;
-    
-    // Fecha de generación del PDF
-    const now = new Date();
-    doc.setFontSize(10);
-    doc.text(`PDF generated on: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 20, 280);
-    
-    // Guardar el PDF
-    const fileName = `petition_response_${response.guestName || 'anonymous'}_${formattedDate.replace(/\//g, '-')}.pdf`;
-    doc.save(fileName);
-}
+            // Generar PDF para una respuesta (función corregida)
+            async function generatePDF(response) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Título
+                doc.setFontSize(20);
+                doc.text("PETITION RESPONSE", 105, 20, { align: 'center' });
+                
+                // Línea separadora
+                doc.setDrawColor(0);
+                doc.setLineWidth(0.5);
+                doc.line(20, 25, 190, 25);
+                
+                // Información de la respuesta
+                doc.setFontSize(12);
+                let yPosition = 35;
+                
+                // Nombre
+                doc.setFont(undefined, 'bold');
+                doc.text("Name:", 20, yPosition);
+                doc.setFont(undefined, 'normal');
+                doc.text(response.guestName || 'Not provided', 60, yPosition);
+                yPosition += 10;
+                
+                // Fecha
+                let formattedDate = 'No date provided';
+                if (response.date) {
+                    const dateObj = new Date(response.date);
+                    if (!isNaN(dateObj.getTime())) {
+                        formattedDate = dateObj.toLocaleDateString();
+                    }
+                }
+                
+                doc.setFont(undefined, 'bold');
+                doc.text("Date:", 20, yPosition);
+                doc.setFont(undefined, 'normal');
+                doc.text(formattedDate, 60, yPosition);
+                yPosition += 15;
+                
+                // Firma
+                if (response.signatureData) {
+                    doc.setFont(undefined, 'bold');
+                    doc.text("Signature:", 20, yPosition);
+                    yPosition += 10;
+                    
+                    try {
+                        // Extraer solo la parte base64 del data URI
+                        const base64Data = response.signatureData.replace(/^data:image\/png;base64,/, '');
+                        
+                        // Añadir la imagen de la firma
+                        doc.addImage(base64Data, 'PNG', 20, yPosition, 100, 40);
+                        yPosition += 50;
+                    } catch (error) {
+                        console.error('Error adding signature to PDF:', error);
+                        doc.text("Error displaying signature", 20, yPosition);
+                        yPosition += 10;
+                    }
+                }
+                
+                // Línea separadora
+                yPosition += 5;
+                doc.line(20, yPosition, 190, yPosition);
+                yPosition += 10;
+                
+                // Información de la petición
+                doc.setFont(undefined, 'bold');
+                doc.text("Petition Details:", 20, yPosition);
+                yPosition += 10;
+                
+                doc.setFont(undefined, 'normal');
+                const petitionTitle = headerTitle.textContent;
+                const petitionSubtitle = headerSubtitle.textContent;
+                
+                doc.text(`Title: ${petitionTitle}`, 20, yPosition);
+                yPosition += 7;
+                doc.text(`Subtitle: ${petitionSubtitle}`, 20, yPosition);
+                yPosition += 10;
+                
+                // Fecha de generación del PDF
+                const now = new Date();
+                doc.setFontSize(10);
+                doc.text(`PDF generated on: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`, 20, 280);
+                
+                // Guardar el PDF
+                const fileName = `petition_response_${response.guestName || 'anonymous'}_${formattedDate.replace(/\//g, '-')}.pdf`;
+                doc.save(fileName);
+            }
             
             function enableEditMode() {
                 mainContainer.classList.add('edit-mode');
@@ -1383,6 +1428,9 @@ async function generatePDF(response) {
                 const width = Math.min(window.innerWidth * 0.9, maxWidth);
                 canvas.width = width;
                 canvas.height = width * 0.4;
+                
+                // Restaurar el contenido del canvas después del redimensionamiento
+                restoreCanvas();
             }
             
             resizeCanvas();
@@ -1425,6 +1473,8 @@ async function generatePDF(response) {
             function stopDrawing() {
                 drawing = false;
                 ctx.beginPath();
+                // Guardar el estado actual después de terminar de dibujar
+                backupCanvas();
             }
             
             function stopDrawingTouch(e) {
@@ -1460,6 +1510,8 @@ async function generatePDF(response) {
             // Clear canvas
             clearButton.addEventListener('click', function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Actualizar el backup después de limpiar
+                backupCanvas();
             });
             
             // Función para mostrar errores
