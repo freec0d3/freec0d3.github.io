@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dynamic Form - Editor and Preview</title>
   <style>
     /* Existing editor styles (remain the same) */
@@ -332,7 +333,7 @@
       cursor: text;
     }
 
-    .add-option {
+    .add-option,.add-other {
       margin-top: 8px;
       font-size: 14px;
       color: #1a73e8;
@@ -341,7 +342,7 @@
       display: inline-block;
     }
 
-    .add-option:hover { text-decoration: underline; }
+    .add-option:hover,.add-other { text-decoration: underline; }
 
     .footer {
       padding: 16px 24px;
@@ -588,7 +589,7 @@
     }
 
     .preview-logo-container img {
-            width: 600px;
+            width: 100%;
             height: auto;
             border-radius: 8px;
             object-fit: contain;
@@ -827,7 +828,7 @@
     }
     
     .preview-required-marker {
-      color: var(--error-color);
+      color: red;
     }
 
     /* Modal background */
@@ -891,6 +892,19 @@
   font-size: 13px;
   display: none;
   margin-top: 8px;
+}
+@media (max-width: 640px) {
+  #previewHeaderContainer,
+  #preview-container-date_1,
+  .preview-form-container,
+  .preview-form-container2,
+  .preview-form-container3,
+  .preview-logo-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
 }
 
   </style>
@@ -988,7 +1002,7 @@
       </div>
 
       <div class="footer">
-        <button class="submit-btn" type="button" id="sendToGoogle">Send to Google</button>
+        <button class="submit-btn" type="button" id="sendToGoogle">Save configuration</button>
       </div>
 
       <!-- Validation status -->
@@ -1051,8 +1065,8 @@
 
   <script>
     // URL to load configuration
-    const CONFIG_URL = 'https://script.google.com/macros/s/AKfycbzGabnF9fDLLuqNTnonsyOuAR_liKKyF_bEKR95FGb4cJd3hxAPjjcPgsutAjv6dbaC/exec';
-    const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzGabnF9fDLLuqNTnonsyOuAR_liKKyF_bEKR95FGb4cJd3hxAPjjcPgsutAjv6dbaC/exec';
+    const CONFIG_URL = 'https://script.google.com/macros/s/AKfycbwvU0m1h1vqSGhUL0_hHBt_gYyJFH-HEbYJSt6vm17M8vmANlCyObfmHJ5f4nxCK3RJ/exec';
+    const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwvU0m1h1vqSGhUL0_hHBt_gYyJFH-HEbYJSt6vm17M8vmANlCyObfmHJ5f4nxCK3RJ/exec';
     
     // Default configuration (in case of error)
     const DEFAULT_CONFIG_STRING = `{
@@ -1441,7 +1455,8 @@ function createPreviewQuestion(containerId, config) {
     } else {
       questionText.className = "preview-question";
       if (config.required) {
-        questionText.innerHTML = config.text + ' <span class="preview-required-marker">*</span>';
+        questionText.innerHTML = '<span class="preview-required-marker">*</span> ' + config.text;
+
       } else {
         questionText.innerHTML = config.text;
       }
@@ -2716,7 +2731,7 @@ document.getElementById("sendToGoogle").addEventListener("click", async () => {
     toast.classList.add("show");
    
 
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzGabnF9fDLLuqNTnonsyOuAR_liKKyF_bEKR95FGb4cJd3hxAPjjcPgsutAjv6dbaC/exec", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwvU0m1h1vqSGhUL0_hHBt_gYyJFH-HEbYJSt6vm17M8vmANlCyObfmHJ5f4nxCK3RJ/exec", {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data)
@@ -2739,8 +2754,7 @@ document.getElementById("sendToGoogle").addEventListener("click", async () => {
   }
 });
 
-
-  function serializeForm() {
+function serializeForm() {
   const formData = {
     logoConfig: {
       primaryColor: document.getElementById("themeColor").value,
@@ -2780,23 +2794,22 @@ document.getElementById("sendToGoogle").addEventListener("click", async () => {
 
     } else if (type === "radio" || type === "checkbox" || type === "dropdown") {
       const options = [];
-      block.querySelectorAll(".option").forEach(opt => {
-        if (opt.classList.contains("option-other")) {
-          // opción especial Other
-          options.push({ value: "other", label: "Other" });
-        } else {
-          const textEl = opt.querySelector(".option-text");
-          if (textEl) {
-            const text = textEl.value.trim();
-            if (text) {
-              options.push({
-                value: text.toLowerCase().replace(/\s+/g, "_"),
-                label: text
-              });
-            }
-          }
+
+      // tomar todas las opciones escritas en el editor
+      block.querySelectorAll(".option-text").forEach(input => {
+        const text = (input.value || input.textContent || "").trim();
+        if (text) {
+          options.push({
+            value: text.toLowerCase().replace(/\s+/g, "_"),
+            label: text
+          });
         }
       });
+
+      // si existe la opción especial "Other"
+      if (block.querySelector(".option-other")) {
+        options.push({ value: "other", label: "Other" });
+      }
 
       formData.questionsConfig.push({
         type,
@@ -2826,6 +2839,7 @@ document.getElementById("sendToGoogle").addEventListener("click", async () => {
   return formData;
 }
 
+
     // Function to show validation information
     function showValidationInfo(data) {
       const validationStatus = document.getElementById('validationStatus');
@@ -2850,7 +2864,6 @@ function loadForm(data) {
   // Logo
   if (data.logoConfig && data.logoConfig.logo && data.logoConfig.logo.url) {
     document.getElementById('logoUrl').value = data.logoConfig.logo.url;
-    // Update preview
     const logoPreview = document.getElementById('logoPreview');
     logoPreview.innerHTML = `<img src="${data.logoConfig.logo.url}" alt="Logo" onerror="this.style.display='none'; logoPreview.innerHTML='<span style=color:#999;font-size:12px;>Invalid image</span>';" />`;
   }
@@ -2868,7 +2881,7 @@ function loadForm(data) {
     document.getElementById('closingMessage').innerHTML = data.thanksConfig.thanksHTML;
   }
 
- // Content
+  // Content
   const container = document.getElementById("questions");
   container.innerHTML = "";
   
@@ -2877,59 +2890,71 @@ function loadForm(data) {
     fieldCounters[key] = 1;
   }
 
-  (data.questionsConfig || []).forEach((q) => {
-    // Determine type for frontend
-    let frontendType = q.type;
-    if (q.type === "textarea") frontendType = "paragraph";
-    
-    let block;
-    if (q.type === "textblock") {
-      // ... código para textblock ...
-    } else {
-      // Create normal question block
-      block = createQuestionBlock(frontendType);
+  // Función auxiliar para crear bloques de manera síncrona
+  const createBlockWithOptions = (q) => {
+    return new Promise((resolve) => {
+      let frontendType = q.type;
+      if (q.type === "textarea") frontendType = "paragraph";
       
-      // Set basic values
-      const editor = block.querySelector(".rich-text-editor.question-input");
-      if (editor && q.text) {
-        editor.innerHTML = q.text;
-        editor.classList.remove('placeholder');
-      }
+      let block;
       
-      // Set if required
-      if (q.required !== undefined) {
-        const checkbox = block.querySelector(".required-checkbox");
-        if (checkbox) {
-          checkbox.checked = q.required;
+      if (q.type === "textblock") {
+        // Código para textblock (mantener igual)
+        block = createTextBlock();
+        const editor = block.querySelector(".rich-text-editor");
+        if (editor && q.text) {
+          editor.innerHTML = q.text;
+          editor.classList.remove('placeholder');
+        }
+      } else {
+        // Create normal question block
+        block = createQuestionBlock(frontendType);
+        
+        // Set basic values
+        const editor = block.querySelector(".rich-text-editor.question-input");
+        if (editor && q.text) {
+          editor.innerHTML = q.text;
+          editor.classList.remove('placeholder');
+        }
+        
+        // Set if required
+        if (q.required !== undefined) {
+          const checkbox = block.querySelector(".required-checkbox");
+          if (checkbox) {
+            checkbox.checked = q.required;
+          }
+        }
+        
+        // Set placeholder if exists and is a text type
+        if (q.placeholder && ["text", "paragraph"].includes(frontendType)) {
+          const inputElement = block.querySelector(".short-answer-input, .paragraph-input");
+          if (inputElement) {
+            inputElement.placeholder = q.placeholder;
+          }
         }
       }
       
-      // Set placeholder if exists and is a text type
-      if (q.placeholder && ["text", "paragraph"].includes(frontendType)) {
-        const inputElement = block.querySelector(".short-answer-input, .paragraph-input");
-        if (inputElement) {
-          inputElement.placeholder = q.placeholder;
-        }
-      }
+      container.appendChild(block);
       
-      // ✅ CORRECCIÓN: Manejar dropdown, radio y checkbox de manera más directa
-      if (["radio", "checkbox", "dropdown"].includes(frontendType)) {
-        const select = block.querySelector('.type-select');
-        if (select) {
-          select.value = frontendType;
-          
-          // ✅ EJECUTAR INMEDIATAMENTE sin setTimeout anidados
-          const evt = new Event('change', { bubbles: true });
-          select.dispatchEvent(evt);
-          
-          // ✅ ESPERAR UN FRAME para que el DOM se actualice, luego llenar opciones
-          requestAnimationFrame(() => {
-            if (q.options && q.options.length > 0) {
+      // Para tipos con opciones, manejarlos después de que el bloque esté en el DOM
+      if (["radio", "checkbox", "dropdown"].includes(frontendType) && q.options && q.options.length > 0) {
+        // Esperar a que el bloque se renderice completamente
+        setTimeout(() => {
+          const select = block.querySelector('.type-select');
+          if (select) {
+            select.value = frontendType;
+            
+            // Disparar evento change
+            const evt = new Event('change', { bubbles: true });
+            select.dispatchEvent(evt);
+            
+            // Esperar a que se complete el cambio de tipo
+            setTimeout(() => {
               const questionBody = block.querySelector(".question-body");
               const optionsDiv = questionBody.querySelector(".options");
               
               if (optionsDiv) {
-                // Clear existing options (default ones)
+                // Clear existing options
                 optionsDiv.innerHTML = "";
                 
                 // Add each option
@@ -2962,38 +2987,48 @@ function loadForm(data) {
                   questionBody.appendChild(addOptionLink);
                 }
               }
-            }
-          });
-        }
+              
+              resolve(block);
+            }, 50);
+          } else {
+            resolve(block);
+          }
+        }, 10);
       } else {
-        // For other types, just trigger the change event
-        const evt = new Event('change', { bubbles: true });
-        const select = block.querySelector('.type-select');
-        if (select) {
-          select.dispatchEvent(evt);
-        }
+        // Para otros tipos, solo disparar el evento change
+        setTimeout(() => {
+          const select = block.querySelector('.type-select');
+          if (select) {
+            const evt = new Event('change', { bubbles: true });
+            select.dispatchEvent(evt);
+          }
+          resolve(block);
+        }, 10);
       }
+    });
+  };
+
+  // Cargar bloques secuencialmente para evitar race conditions
+  const loadBlocksSequentially = async () => {
+    for (const q of (data.questionsConfig || [])) {
+      await createBlockWithOptions(q);
     }
     
-    container.appendChild(block);
-  });
-  
-// Guardar copia global de la config original (respaldo)
-questionsConfig = data.questionsConfig || [];
-window.questionsConfig = questionsConfig;
+    // Guardar copia global de la config original
+    questionsConfig = data.questionsConfig || [];
+    window.questionsConfig = questionsConfig;
+    
+    // Generar la preview
+    generatePreviewFromConfig({
+      logoConfig: data.logoConfig || {},
+      titleConfig: data.titleConfig || {},
+      descriptionConfig: data.descriptionConfig || {},
+      thanksConfig: data.thanksConfig || {},
+      questionsConfig: data.questionsConfig || []
+    });
+  };
 
-// Generar la preview directamente desde la config del servidor
-generatePreviewFromConfig({
-  logoConfig: data.logoConfig || {},
-  titleConfig: data.titleConfig || {},
-  descriptionConfig: data.descriptionConfig || {},
-  thanksConfig: data.thanksConfig || {},
-  questionsConfig: data.questionsConfig || []
-});
-
-// (Opcional) Si más adelante quieres seguir forzando un re-render desde el DOM,
-// puedes mantener un pequeño retry de seguridad. Pero en principio ya no hace falta.
-
+  loadBlocksSequentially();
 }
 
     // Change theme color
