@@ -1649,16 +1649,26 @@ function createPreviewQuestion(containerId, config) {
       
       // Adjust canvas size
       function resizeCanvas() {
-        const width = canvas.offsetWidth;
-        const height = width * 0.6;
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Styles for drawing
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = '#000';
+  // Guardar el contenido actual
+  const temp = document.createElement("canvas");
+  temp.width = canvas.width;
+  temp.height = canvas.height;
+  temp.getContext("2d").drawImage(canvas, 0, 0);
+
+  // Cambiar tamaño
+  const width = canvas.offsetWidth;
+  const height = width * 0.6;
+  canvas.width = width;
+  canvas.height = height;
+
+  // Restaurar contenido escalado
+  ctx.drawImage(temp, 0, 0, temp.width, temp.height, 0, 0, canvas.width, canvas.height);
+
+  // Estilos
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#000';
       }
       
       // Set initial position
