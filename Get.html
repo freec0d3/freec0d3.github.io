@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+<script>
+
+  // Generar o recuperar un ID único
+  function getVisitorId() {
+    let id = localStorage.getItem("visitorId");
+    if (!id) {
+      id = 'xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      localStorage.setItem("visitorId", id);
+    }
+    return id;
+  }
+
+  const visitorId = getVisitorId();
+
+  // Rescatar parámetro "App" de la URL
+  function getAppParam() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("App") || "";
+  }
+
+  const appParam = getAppParam();
+
+  // Definir enlaces posibles según appParam
+  function getFiverrLink(appParam) {
+    switch (appParam) {
+      case "Code":
+        return "https://docs.google.com/document/d/11OwRcYzRvnt8dcJI74yk6SiVEyWFpCOc/edit?usp=sharing&ouid=117460540053575524982&rtpof=true&sd=true"; // página general
+      case "Index":
+        return "https://docs.google.com/document/d/1o02f1JOXsQ-KjjHglPDFPeY3S23ijvX7/edit?usp=sharing&ouid=117460540053575524982&rtpof=true&sd=true"; // página general
+      case "SAPPESP":
+        return "https://es.fiverr.com/s/BR27qWd"; // ejemplo
+      case "SliderAPP":
+        return "https://es.fiverr.com/s/jjbmky9"; // ejemplo
+      case "SliderOtherAPP":
+        return "https://es.fiverr.com/s/jjbmky9"; // ejemplo
+      default:
+        return "https://www.fiverr.com/tu-enlace"; // tu enlace personalizado por defecto
+    }
+  }
+
+  const fiverr = getFiverrLink(appParam);
+
+  // Registrar visita con ambos datos
+  window.addEventListener("load", () => {
+    console.log("proof");
+    fetch("https://script.google.com/macros/s/AKfycbwyAPgh8IOHDHrnhoOLHTDfpYamKI0vEQcb92HTEKTtb_uS8ygITsi2iMRtP8uUNlsmJQ/exec", {
+      method: "POST",
+      contentType: "application/json",
+      body: JSON.stringify({
+        userAgent: navigator.userAgent,
+        referrer: document.referrer,
+        visitorId: visitorId,
+        appParam: appParam
+      })
+    }).catch(err => console.error("No se pudo registrar la visita", err));
+
+    // Redirigir
+ window.location.href = fiverr;
+  });
+
+
+
+//file:///C:/Users/furreta/Desktop/makeYourFOrm/redirect.html?From=yt
+//http://freec0d3.github.io/redirect.html?From=tw
+</script>
+
+</head>
+<body>
+  <p>Redirecting to Fiverr, please wait...</p>
+</body>
+</html>
