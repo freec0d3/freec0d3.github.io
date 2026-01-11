@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+<script>
+
+  // Generate or retrieve a unique ID
+  function getVisitorId() {
+    let id = localStorage.getItem("visitorId");
+    if (!id) {
+      id = 'xxxx-4xxx-yxxx-xxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      localStorage.setItem("visitorId", id);
+    }
+    return id;
+  }
+
+  const visitorId = getVisitorId();
+
+  // Extract "From" parameter from URL
+  function getAppParam() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("From") || "";
+  }
+
+  const appParam = getAppParam();
+
+
+
+  // Register visit with both data
+  window.addEventListener("load", () => {
+    console.log("proof");
+    fetch("Here goes the backend link", {
+      method: "POST",
+      contentType: "application/json",
+      body: JSON.stringify({
+        userAgent: navigator.userAgent,
+        visitorId: visitorId,
+        appParam: appParam
+      })
+    }).catch(err => console.error("Could not register visit", err));
+
+    // Redirect
+    window.location.href = "https://docs.google.com/document/d/1jsJLsw3Ej49tFTYnHZn4PCHOfPypHtqVuVEMmJ1f0UQ/edit?usp=sharing";
+  });
+
+
+</script>
+
+</head>
+<body>
+  <p>Redirecting, please wait...</p>
+</body>
+</html>
